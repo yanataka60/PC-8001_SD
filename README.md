@@ -283,7 +283,7 @@ DeepScanの場合
 
 ![AutoRun3](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/autorun(3).JPG)
 
-BASICプログラム中のClear文を確認して、値を設定、CTRL+BをCTRL+Cに、CLOAD"DS"をLOAD""に修正
+BASICプログラム中のClear文を確認して値を設定、CTRL+BをCTRL+Cに、CLOAD"DS"をLOAD""に修正
 
 ![AutoRun4](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/autorun(4).JPG)
 
