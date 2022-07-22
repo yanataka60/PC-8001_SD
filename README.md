@@ -66,13 +66,24 @@
 
 　「SdFat」で検索すれば見つかります。「SdFat」と「SdFat - Adafruit Fork」が見つかりますが「SdFat」のほうを使っています。
 
+## コネクタの取り付け
+### 2x25Pinコネクタ(J1)を取り付ける場合
+　基板の表側に取り付けます。なお、取付穴は外側から１列目と２列目を使います。
+![Flat cable1](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/fitting(2).jpg)
+
+### 50Pカードエッジコネクタ(J3)を取り付ける場合
+　基板の裏側に取り付けます。なお、取付穴は外側から１列目と３列目を使います。
+![Flat cable2](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/fitting(1).jpg)
+
 ## 接続
 　PC-8001本体後ろの拡張端子に接続します。
 ### フラットケーブルによる接続
-![Flat cable](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/PC-8001_SD(5).JPG)
+![Flat cable1](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/PC-8001_SD(3).JPG)
+![Flat cable2](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/PC-8001_SD(5).JPG)
 
 ### カードエッジコネクタによる接続
-![Card Edge Connector](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/PC-8001_SD(4).JPG)
+![Card Edge Connector1](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/PC-8001_SD(2).JPG)
+![Card Edge Connector2](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/PC-8001_SD(4).JPG)
 
 ## SD-CARD
 　FAT16又はFAT32が認識できます。
