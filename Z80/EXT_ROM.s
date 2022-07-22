@@ -66,7 +66,7 @@ LBUF		EQU		0FF66H
 INIT:	LD		A,8AH
 		OUT		(0FFH),A
 ;出力BITをリセット
-		LD		A,00H             ;PORTA <- 0
+		XOR		A                 ;PORTA <- 0
 		OUT		(0FCH),A
 		OUT		(0FEH),A          ;PORTC <- 0
 
@@ -251,7 +251,7 @@ STMD8:	CALL	CONOUT
 		LD		HL,MSG_AD2        ;入力待ちメッセージ表示
 		CALL	MSGOUT
 STMD3:	CALL	KYSCAN            ;1文字入力待ち
-		CP		00H
+		AND		A
 		JR		Z,STMD3
 		CP		1BH               ;ESCで打ち切り
 		JR		Z,STMD4
@@ -272,7 +272,7 @@ STMW:	INC		HL
 		JP		C,MONERR
 
 STSP1:	LD		A,(DE)
-		CP		00H
+		AND		A
 		JR		Z,STMW9           ;アドレスのみなら終了
 		CP		20H
 		JR		NZ,STMW1
@@ -286,7 +286,7 @@ STMW1:
 		INC		HL
 
 STSP2:	LD		A,(DE)
-		CP		00H               ;一行終了
+		AND		A               ;一行終了
 		JR		Z,STMW8
 		CP		20H
 		JR		NZ,STMW1
@@ -331,9 +331,9 @@ DIRLIST:
 		PUSH	BC
 		LD		B,21H             ;ファイルネーム検索文字列33文字分を送信
 STLT1:	LD		A,(DE)
-		CP		00H
+		AND		A
 		JR		NZ,STLT2
-		LD		A,00H
+		XOR		A
 STLT2:	CALL	AZLCNV            ;大文字に変換
 		CALL	SNDBYTE           ;ファイルネーム検索文字列を送信
 		INC		DE
@@ -352,7 +352,7 @@ DL1:
 		LDIR
 		EX		DE,HL
 DL2:	CALL	RCVBYTE           ;'00H'を受信するまでを一行とする
-		CP		00H
+		AND		A
 		JR		Z,DL3
 		CP		0FFH              ;'0FFH'を受信したら終了
 		JR		Z,DL4
@@ -364,7 +364,7 @@ DL2:	CALL	RCVBYTE           ;'00H'を受信するまでを一行とする
 DL3:	LD		(HL),00H
 		LD		HL,LBUF           ;'00H'を受信したら一行分を表示して改行
 DL31:	LD		A,(HL)
-		CP		00H
+		AND		A
 		JR		Z,DL33
 		CALL	CHROUT
 		INC		HL
@@ -393,7 +393,7 @@ DL5:	PUSH	HL
 		POP		HL
 DL6:	CALL	KYSCAN            ;1文字入力待ち
 		CALL	AZLCNV
-		CP		00H
+		AND		A
 		JR		Z,DL6
 		CP		1BH               ;ESCで打ち切り
 		JR		Z,DL7
@@ -401,7 +401,7 @@ DL6:	CALL	KYSCAN            ;1文字入力待ち
 		JR		Z,DL9
 		CP		42H               ;「B」で前ページ
 		JR		Z,DL8
-		LD		A,00H             ;それ以外で継続
+		XOR		A                 ;それ以外で継続
 		JR		DL8
 DL9:	LD		A,1EH
 		CALL	CONOUT
@@ -446,7 +446,7 @@ MCNLOAD:LD		HL,MSG_LD        ;LOADING表示
 		LD		HL,(SADRS)
 MCLD1:	CALL	RCVBYTE          ;ヘッダー3AH受信、廃棄
 		CALL	RCVBYTE          ;データ長
-		CP		00H
+		AND		A
 		JR		Z,MCLD3          ;データ長が0なら終了
 		LD		B,A
 MCLD2:	CALL	RCVBYTE          ;実データ受信
@@ -666,7 +666,7 @@ CMDLD2:	CALL	RCVBYTE
 		LD		DE,IBUF
 		LD		BC,0006H
 		LDIR
-		LD		A,00H
+		XOR		A
 		LD		(DE),A
 		LD		HL,IBUF
 		CALL	MSGOUT
@@ -679,7 +679,7 @@ CMDLD4:	CALL	RCVBYTE
 		LD		(HL),A
 		INC		HL
 
-		CP		00H
+		AND		A
 		JR		Z,CMDLD5
 		JR		CMDLD3
 CMDLD5:	DEC		B
@@ -760,7 +760,7 @@ CMDKILL:
 		CALL	STCMD
 		JR		NZ,CMDKL4        ;ファイル名が送信できなかった。
 		CALL	RCVBYTE
-		CP		00H
+		AND		A
 		JR		NZ,CMDKL3        ;ファイルが存在しない
 		LD		HL,MSG_KL
 		CALL	MSGOUT
