@@ -334,5 +334,3 @@ Sの後ろ、アドレス、データの区切りに空白が有っても無く�
 　NBASICのコマンド追加に当たっては、ちくらっぺ様のSD-DOSがとても参考になりました。ありがとうございました。
 
 　　https://github.com/chiqlappe/SD-DOS
-
-　Retro Computerプログラム入力ツール「DumpListEditor」を公開してくださっているbugfire2009様、ありがとうございます。
