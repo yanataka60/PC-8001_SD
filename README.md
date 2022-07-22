@@ -47,7 +47,7 @@
 |7|4|MOSI|
 |8|6|CS|
 
-![MicroSD Card Adapter](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/MicroSD%20Card%20Adapter.jpg)
+![MicroSD Card Adapter](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/MicroSD%20Card%20Adapter.JPG)
 
 ### その他必要なもの
 　基板のコネクタは2x22Pinで設計していますが、2.54mmピッチ2x22Pinフラットケーブルが手に入りにくいので2.54mmピッチ2x25Pinフラットケーブルで代用しています。
