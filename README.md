@@ -94,15 +94,15 @@
 
 　例)
 
-　　BASIC+機械語
+　　BASIC+機械語                         -> LOAD "DOSファイル名"[CR]、MON[CR]、L[CR]
 
-　　機械語+機械語
+　　機械語+機械語                        -> MON[CR]、 L DOSファイル名[CR]、L[CR]
 
-　　オートスタート+BASIC
+　　オートラン機能ファイル+BASIC         -> MON[CR]、L DOSファイル名[CR](以下オートラン)
 
-　　オートスタート+BASIC+機械語
+　　オートラン機能ファイル+BASIC+機械語  -> MON[CR]、L DOSファイル名[CR](以下オートラン)
 
-　　オートスタート+機械語+機械語
+　　オートラン機能ファイル+機械語+機械語 -> MON[CR]、L DOSファイル名[CR](以下オートラン)
 
 　　など
 
@@ -236,7 +236,7 @@ B[CR]と動作は同じです。
 #### D DOSファイル名[CR]
 
 
-### オートスタート
+### ファンクションキーを利用したオートラン機能
 
 ## 操作上の注意
 　「SD-CARD INITIALIZE ERROR」と表示されたときは、SD-CARDが挿入されているか確認し、PC-8001本体をリセットしてください。Arduinoのみのリセットでは復旧しません。
@@ -252,7 +252,7 @@ B[CR]と動作は同じです。
 
 　New City HeroのCMT形式ファイルに次の手順をあてPC-8001_SD用のCMT形式ファイルを作り、SD-CARDに保存してください。
 
-　　1　頒布していただいたCMTファイルをbugfire2009さんの「DumpListEditor」にDrag&Dropする
+　　1　頒布していただいたNew City HeroのCMTファイルをbugfire2009さんの「DumpListEditor」にDrag&Dropする
 
 　　2　表示される3つのBINファイルをうち、2番目のBINファイルを「マシン語入力に送る」を押す
 
@@ -277,3 +277,4 @@ B[CR]と動作は同じです。
 
 　　https://github.com/kuninet/PC-8001-SD-8kRAM
 
+　また、次の
