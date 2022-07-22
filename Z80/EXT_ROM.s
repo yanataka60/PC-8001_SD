@@ -760,6 +760,7 @@ CMDKILL:
 		CALL	STCMD
 		JR		NZ,CMDKL4        ;ファイル名が送信できなかった。
 		CALL	RCVBYTE
+		CP		00H
 		JR		NZ,CMDKL3        ;ファイルが存在しない
 		LD		HL,MSG_KL
 		CALL	MSGOUT
