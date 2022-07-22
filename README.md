@@ -38,7 +38,7 @@
 
 　　　注3)Arduino Pro MiniはA4、A5ピンも使っています。
 
-　　　注4)Arduino等に使われる5V電源に対応したMicroSD Card Adapterも正しく信号を繋げば使えます。
+　　　注4)Arduino等に使われる5V電源に対応したMicroSD Card Adapterも正しく信号を繋げば使えます。変換基板等繋ぎ方は適宜対応してください。
 
 |AE-microSD-LLCNVピン番号|MicroSD Card Adapterピン番号|信号名|
 | ---------------------- | -------------------------- | ---- |
