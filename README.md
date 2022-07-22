@@ -270,8 +270,7 @@ Sの後ろ、アドレス、データの区切りに空白が有っても無く�
 
 　2　SD-CARDからのBASICプログラムをLOADするコマンドは「LOAD」でファイル名を指定する必要がありませんので「CLOAD"ファイル名"」を「LOAD""」とする必要があります。
 
-　例)
-サウンド付きRally-xの場合
+　例)サウンド付きRally-xの場合
 
 ![AutoRun1](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/autorun(1).JPG)
 
@@ -279,7 +278,7 @@ CTRL+BをCTRL+Cに修正
 
 ![AutoRun2](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/autorun(2).JPG)
 
-DeepScanの場合
+　例)DeepScanの場合
 
 ![AutoRun3](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/autorun(3).JPG)
 
