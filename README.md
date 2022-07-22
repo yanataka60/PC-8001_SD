@@ -270,6 +270,19 @@ Sの後ろ、アドレス、データの区切りに空白が有っても無く�
 
 　2　SD-CARDからのBASICプログラムをLOADするコマンドは「LOAD」でファイル名を指定する必要がありませんので「CLOAD"ファイル名"」を「LOAD""」とする必要があります。
 
+　例)
+サウンド付きRally-xの場合
+![AutoRun1](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/autorun(1).JPG)
+CTRL+BをCTRL+Cに修正
+![AutoRun2](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/autorun(2).JPG)
+
+DeepScanの場合
+![AutoRun3](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/autorun(3).JPG)
+BASICプログラム中のClear文を確認して、値を設定、CTRL+BをCTRL+Cに、CLOAD"DS"をLOAD""に修正
+![AutoRun4](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/autorun(4).JPG)
+![AutoRun5](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/autorun(5).JPG)
+
+
 ## 操作上の注意
 　「SD-CARD INITIALIZE ERROR」と表示されたときは、SD-CARDが挿入されているか確認し、PC-8001本体をリセットしてください。Arduinoのみのリセットでは復旧しません。
 
