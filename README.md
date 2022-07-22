@@ -1,10 +1,10 @@
-# PC-8001にSD-CARDからのアプリケーション起動、ロード、セーブ機能
+# PC-8001にSD-CARDからCMT形式ファイルのロード、セーブ機能
 
 ![PC-8001_SD](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/TITLE.jpg)
 
-　PC-8001でSD-CARDからのゲーム起動、BASICからSD-CARDへのロード、セーブを実現するものです。
+　PC-8001でSD-CARDからCMT形式ファイルのロード、セーブ機能を実現するものです。
 
-　FDDの代替ではなくCMTの代替装置として設計しています。CMTからの読み込み実行にかかっていたゲームがものの数十秒で実行できるようになります。
+　CMTからの読み込み実行に数分掛かっていたゲームも数十秒で実行できます。
 
 　接続は、PC-8001本体後ろの拡張端子に接続しますが、50pフラットケーブルでの接続、50pカードエッジコネクタでの直結の二通りのどちらかを選択できます。
 
@@ -13,7 +13,7 @@
 ## 回路図
 　KiCadフォルダ内のPC-8001_SD.pdfを参照してください。
 
-[回路図](https://github.com/yanataka60/MZ-2000_SD/blob/main/KiCad/MZ-2000_SD/MZ2000_SD.pdf)
+[回路図](https://github.com/yanataka60/PC-8001_SD/blob/main/Kicad/PC-8001_SD.pdf)
 
 ## 部品
 |番号|品名|数量|備考|
