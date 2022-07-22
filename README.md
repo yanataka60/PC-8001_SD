@@ -1,6 +1,6 @@
 # PC-8001にSD-CARDからのアプリケーション起動、ロード、セーブ機能
 
-![PC-8001_SD](https://github.com/yanataka60/MZ-2000_SD/blob/main/JPEG/TITLE.jpg)
+![PC-8001_SD](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/TITLE.jpg)
 
 　PC-8001でSD-CARDからのゲーム起動、BASICからSD-CARDへのロード、セーブを実現するものです。
 
