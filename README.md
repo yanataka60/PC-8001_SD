@@ -15,6 +15,8 @@
 
 [回路図](https://github.com/yanataka60/PC-8001_SD/blob/main/Kicad/PC-8001_SD.pdf)
 
+![PC-8001_SD](https://github.com/yanataka60/PC-8001_SD/blob/main/Kicad/PC-8001_SD.jpg)
+
 ## 部品
 |番号|品名|数量|備考|
 | ------------ | ------------ | ------------ | ------------ |
