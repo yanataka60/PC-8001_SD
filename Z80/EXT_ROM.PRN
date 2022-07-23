@@ -75,13 +75,13 @@
   6012  21D763        			LD		HL,CMDLOAD
   6015  2239F1        			LD		(TBLOAD),HL
                       	
-  6018  213464        			LD		HL,CMDSAVE
+  6018  213D64        			LD		HL,CMDSAVE
   601B  224BF1        			LD		(TBSAVE),HL
                       	
-  601E  217F64        			LD		HL,CMDFILES
+  601E  218864        			LD		HL,CMDFILES
   6021  224EF1        			LD		(TBFILES),HL
                       	
-  6024  219964        			LD		HL,CMDKILL
+  6024  21A264        			LD		HL,CMDKILL
   6027  2242F1        			LD		(TBKILL),HL
                       	
   602A  C9            			RET
@@ -211,7 +211,7 @@
   60D8  DAC960        			JP		C,MONERR
   60DB  223DFF        			LD		(SADRS),HL        ;SARDS保存
                       	
-  60DE  21E764        	STMD6:	LD		HL,MSG_AD1        ;DUMP TITLE表示
+  60DE  21F064        	STMD6:	LD		HL,MSG_AD1        ;DUMP TITLE表示
   60E1  CDED52        			CALL	MSGOUT
   60E4  0E10          			LD		C,10H             ;16行(128Byte)を表示
   60E6  2A3DFF        	STMD7:	LD		HL,(SADRS)        ;アドレス表示
@@ -249,7 +249,7 @@
   6122  0D            			DEC		C
   6123  20C1          			JR		NZ,STMD7
                       			
-  6125  210F65        			LD		HL,MSG_AD2        ;入力待ちメッセージ表示
+  6125  211865        			LD		HL,MSG_AD2        ;入力待ちメッセージ表示
   6128  CDED52        			CALL	MSGOUT
   612B  CDAC0F        	STMD3:	CALL	KYSCAN            ;1文字入力待ち
   612E  A7            			AND		A
@@ -295,7 +295,7 @@
   6172  18F5          			JR		STSP2
                       	
   6174  E5            	STMW8:	PUSH	HL
-  6175  219866        			LD		HL,MSG_FDW        ;行頭に'*S '
+  6175  21B366        			LD		HL,MSG_FDW        ;行頭に'*S '
   6178  CDED52        			CALL	MSGOUT
   617B  E1            			POP		HL
   617C  E5            			PUSH	HL
@@ -313,7 +313,7 @@
   618E  23            	STLT:	INC		HL
   618F  CD6763        			CALL	STFN              ;検索文字列を送信
   6192  EB            			EX		DE,HL
-  6193  219B66        			LD		HL,DEFDIR         ;行頭に'*L 'を付けることでカーソルを移動させリターンで実行できるように
+  6193  21B666        			LD		HL,DEFDIR         ;行頭に'*L 'を付けることでカーソルを移動させリターンで実行できるように
   6196  010300        			LD		BC,DEND-DEFDIR
   6199  CDA361        			CALL	DIRLIST           ;DIRLIST本体をコール
   619C  A7            			AND		A                 ;00以外ならERROR
@@ -380,7 +380,7 @@
   61FB  1849          			JR		DLRET
                       	
   61FD  E5            	DL5:	PUSH	HL
-  61FE  212B65        			LD		HL,MSG_KEY1       ;HIT ANT KEY表示
+  61FE  213465        			LD		HL,MSG_KEY1       ;HIT ANT KEY表示
   6201  CDED52        			CALL	MSGOUT
   6204  2A63EA        			LD		HL,(CUSPOS)
   6207  CDF303        			CALL	CSRADR
@@ -388,7 +388,7 @@
   620C  77            			LD		(HL),A
   620D  3E1C          			LD		A,1CH
   620F  CD5702        			CALL	CONOUT
-  6212  214265        			LD		HL,MSG_KEY2       ;HIT ANT KEY表示
+  6212  214B65        			LD		HL,MSG_KEY2       ;HIT ANT KEY表示
   6215  CDED52        			CALL	MSGOUT
   6218  CDCA5F        			CALL	MONCLF
   621B  E1            			POP		HL
@@ -428,12 +428,12 @@
   625A  CD2B60        			CALL	RCVBYTE          ;ヘッダー受信
   625D  FE3A          			CP		3AH              ;3AHであれば続行
   625F  280C          			JR		Z,MCNLOAD
-  6261  216966        			LD		HL,MSG_F2        ;3AH以外ならエラー
+  6261  217266        			LD		HL,MSG_F2        ;3AH以外ならエラー
   6264  CDED52        			CALL	MSGOUT
   6267  CDCA5F        			CALL	MONCLF
   626A  C37960        			JP		CMD1
                       			
-  626D  21BF64        	MCNLOAD:LD		HL,MSG_LD        ;LOADING表示
+  626D  21C864        	MCNLOAD:LD		HL,MSG_LD        ;LOADING表示
   6270  CDED52        			CALL	MSGOUT
                       	
   6273  213EFF        			LD		HL,SADRS+1       ;SADRS取得
@@ -457,7 +457,7 @@
   6296  CD2B60        			CALL	RCVBYTE          ;チェックサム廃棄
   6299  18EA          			JR		MCLD1
   629B  CD2B60        	MCLD3:	CALL	RCVBYTE          ;チェックサム廃棄
-  629E  21C864        			LD		HL,MSG_OK        ;OK表示
+  629E  21D164        			LD		HL,MSG_OK        ;OK表示
   62A1  CDED52        			CALL	MSGOUT
   62A4  C37960        			JP		CMD1
                       	
@@ -510,7 +510,7 @@
   62F3  CDB062        			CALL	STCMD
   62F6  C27960        			JP		NZ,CMD1
                       	
-  62F9  21CE64        			LD		HL,MSG_WR        ;WRITING表示
+  62F9  21D764        			LD		HL,MSG_WR        ;WRITING表示
   62FC  CDED52        			CALL	MSGOUT
                       	
   62FF  2A3DFF        			LD		HL,(SADRS)       ;SADRSを送信
@@ -533,7 +533,7 @@
   6320  2803          			JR		Z,MONSV3         ;HL = DE までLOOP
   6322  23            	MONSV2:	INC		HL
   6323  18F1          			JR		MONSV1
-  6325  21C864        	MONSV3:	LD		HL,MSG_OK        ;OK表示
+  6325  21D164        	MONSV3:	LD		HL,MSG_OK        ;OK表示
   6328  CDED52        			CALL	MSGOUT
   632B  C37960        			JP		CMD1
                       	
@@ -584,7 +584,7 @@
   6371  C9            			RET
                       	
   6372                	STSV2:                           ;ファイルネームの取得に失敗
-  6372  214A65        			LD		HL,MSG_FNAME
+  6372  215365        			LD		HL,MSG_FNAME
   6375  1858          			JR		ERRMSG
                       	
                       	;**** ファイルネーム送信(IN:HL ファイルネームの先頭) ******
@@ -604,34 +604,34 @@
   638A  F5            			PUSH	AF
   638B  FEF0          			CP		0F0H
   638D  2005          			JR		NZ,ERR3
-  638F  214266        			LD		HL,MSG_F0        ;SD-CARD INITIALIZE ERROR
+  638F  214B66        			LD		HL,MSG_F0        ;SD-CARD INITIALIZE ERROR
   6392  183B          			JR		ERRMSG
   6394  FEF1          	ERR3:	CP		0F1H
   6396  2005          			JR		NZ,ERR4
-  6398  215B66        			LD		HL,MSG_F1        ;NOT FIND FILE
+  6398  216466        			LD		HL,MSG_F1        ;NOT FIND FILE
   639B  1832          			JR		ERRMSG
   639D  FEF3          	ERR4:	CP		0F3H
   639F  2005          			JR		NZ,ERR5
-  63A1  217966        			LD		HL,MSG_F3        ;FILE EXIST
+  63A1  218266        			LD		HL,MSG_F3        ;FILE EXIST
   63A4  1829          			JR		ERRMSG
   63A6  FEF4          	ERR5:	CP		0F4H
   63A8  2005          			JR		NZ,ERR6
-  63AA  215C65        			LD		HL,MSG_CMD       ;COMMAND FAILED
+  63AA  216565        			LD		HL,MSG_CMD       ;COMMAND FAILED
   63AD  1820          			JR		ERRMSG
   63AF  FEF5          	ERR6:	CP		0F5H
   63B1  2005          			JR		NZ,ERR7
-  63B3  218466        			LD		HL,MSG_F5        ;NO BASIC PROGRAM
+  63B3  218D66        			LD		HL,MSG_F5        ;NO BASIC PROGRAM
   63B6  1817          			JR		ERRMSG
   63B8  FEF6          	ERR7:	CP		0F6H
   63BA  2005          			JR		NZ,ERR99
-  63BC  214A65        			LD		HL,MSG_FNAME     ;PARAMETER FAILED
+  63BC  215365        			LD		HL,MSG_FNAME     ;PARAMETER FAILED
   63BF  180E          			JR		ERRMSG
   63C1  CD835E        	ERR99:	CALL	MONBHX
   63C4  7A            			LD		A,D
   63C5  CD5702        			CALL	CONOUT
   63C8  7B            			LD		A,E
   63C9  CD5702        			CALL	CONOUT
-  63CC  219166        			LD		HL,MSG99         ;その他ERROR
+  63CC  21AC66        			LD		HL,MSG99         ;その他ERROR
   63CF  CDED52        	ERRMSG:	CALL	MSGOUT
   63D2  CDCA5F        			CALL	MONCLF
   63D5  F1            			POP		AF
@@ -641,7 +641,7 @@
   63D7                	CMDLOAD:
   63D7  3E73          			LD		A,73H            ;コマンド73Hを送信
   63D9  CDB062        			CALL	STCMD
-  63DC  2055          			JR		NZ,CMDLD8
+  63DC  205E          			JR		NZ,CMDLD8
                       	
   63DE  211801        			LD		HL,0118H         ;1文字目、24行目へカーソルを移動
   63E1  CDA903        			CALL	CSR
@@ -649,209 +649,216 @@
                       			
   63E7  CD2B60        			CALL	RCVBYTE          ;ヘッダー受信
   63EA  FED3          			CP		0D3H             ;D3Hでなければエラー
-  63EC  2801          			JR		Z,CMDLD
-  63EE  C9            			RET
+  63EC  280A          			JR		Z,CMDLD
+  63EE  219A66        			LD		HL,MSG_F6        ;NOT BASIC PROGRAM
+  63F1  CDED52        			CALL	MSGOUT
+  63F4  CDCA5F        			CALL	MONCLF
+  63F7  C9            			RET
                       			
-  63EF                	CMDLD:	
-  63EF  213EEF        			LD		HL,FILNAM        ;CMTファイル中に記載のファイルネーム6文字を受信
-  63F2  0606          			LD		B,06H
-  63F4  CD2B60        	CMDLD2:	CALL	RCVBYTE
-  63F7  77            			LD		(HL),A
-  63F8  23            			INC		HL
-  63F9  10F9          			DJNZ	CMDLD2
+  63F8                	CMDLD:	
+  63F8  213EEF        			LD		HL,FILNAM        ;CMTファイル中に記載のファイルネーム6文字を受信
+  63FB  0606          			LD		B,06H
+  63FD  CD2B60        	CMDLD2:	CALL	RCVBYTE
+  6400  77            			LD		(HL),A
+  6401  23            			INC		HL
+  6402  10F9          			DJNZ	CMDLD2
                       	
-  63FB  21BF64        			LD		HL,MSG_LD        ;LOADING表示
-  63FE  CDED52        			CALL	MSGOUT
+  6404  21C864        			LD		HL,MSG_LD        ;LOADING表示
+  6407  CDED52        			CALL	MSGOUT
                       	
-  6401  213EEF        			LD		HL,FILNAM        ;ファイルネーム表示
-  6404  1196EC        			LD		DE,IBUF
-  6407  010600        			LD		BC,0006H
-  640A  EDB0          			LDIR
-  640C  AF            			XOR		A
-  640D  12            			LD		(DE),A
-  640E  2196EC        			LD		HL,IBUF
-  6411  CDED52        			CALL	MSGOUT
-  6414  CDCA5F        			CALL	MONCLF
+  640A  213EEF        			LD		HL,FILNAM        ;ファイルネーム表示
+  640D  1196EC        			LD		DE,IBUF
+  6410  010600        			LD		BC,0006H
+  6413  EDB0          			LDIR
+  6415  AF            			XOR		A
+  6416  12            			LD		(DE),A
+  6417  2196EC        			LD		HL,IBUF
+  641A  CDED52        			CALL	MSGOUT
+  641D  CDCA5F        			CALL	MONCLF
                       			
-  6417  2A54EB        			LD		HL,(BASSRT)      ;BASICプログラム格納開始位置をHLに設定
+  6420  2A54EB        			LD		HL,(BASSRT)      ;BASICプログラム格納開始位置をHLに設定
                       	
-  641A  060C          	CMDLD3:	LD		B,0CH            ;00Hを12個連続で受信するまでループ
-  641C  CD2B60        	CMDLD4:	CALL	RCVBYTE
-  641F  77            			LD		(HL),A
-  6420  23            			INC		HL
+  6423  060C          	CMDLD3:	LD		B,0CH            ;00Hを12個連続で受信するまでループ
+  6425  CD2B60        	CMDLD4:	CALL	RCVBYTE
+  6428  77            			LD		(HL),A
+  6429  23            			INC		HL
                       	
-  6421  A7            			AND		A
-  6422  2802          			JR		Z,CMDLD5
-  6424  18F4          			JR		CMDLD3
-  6426  05            	CMDLD5:	DEC		B
-  6427  2802          			JR		Z,CMDLD6
-  6429  18F1          			JR		CMDLD4
+  642A  A7            			AND		A
+  642B  2802          			JR		Z,CMDLD5
+  642D  18F4          			JR		CMDLD3
+  642F  05            	CMDLD5:	DEC		B
+  6430  2802          			JR		Z,CMDLD6
+  6432  18F1          			JR		CMDLD4
                       	
-  642B  010700        	CMDLD6:	LD		BC,0007H         ;HLの位置を7つ戻してBASICプログラム終了位置とする
-  642E  ED42          			SBC		HL,BC
+  6434  010700        	CMDLD6:	LD		BC,0007H         ;HLの位置を7つ戻してBASICプログラム終了位置とする
+  6437  ED42          			SBC		HL,BC
                       			
-  6430  C38B1F        			JP		AFTLOAD          ;BASICプログラムLOAD後処理
-  6433                	CMDLD8:
-  6433  C9            			RET
+  6439  C38B1F        			JP		AFTLOAD          ;BASICプログラムLOAD後処理
+  643C                	CMDLD8:
+  643C  C9            			RET
                       			
                       	;********************** BASIC CMT SAVE **********************
-  6434                	CMDSAVE:
-  6434  E5            			PUSH	HL
-  6435  2A54EB        			LD		HL,(BASSRT)      ;BASICプログラム格納開始位置をHLに設定
-  6438  7E            			LD		A,(HL)
-  6439  23            			INC		HL
-  643A  B6            			OR		(HL)
-  643B  E1            			POP		HL
-  643C  3EF5          			LD		A,0F5H           ;BASICプログラムが1行もなければエラー
-  643E  CA8A63        			JP		Z,SDERR
+  643D                	CMDSAVE:
+  643D  E5            			PUSH	HL
+  643E  2A54EB        			LD		HL,(BASSRT)      ;BASICプログラム格納開始位置をHLに設定
+  6441  7E            			LD		A,(HL)
+  6442  23            			INC		HL
+  6443  B6            			OR		(HL)
+  6444  E1            			POP		HL
+  6445  3EF5          			LD		A,0F5H           ;BASICプログラムが1行もなければエラー
+  6447  CA8A63        			JP		Z,SDERR
                       	
-  6441  3E74          			LD		A,74H            ;コマンド74Hを送信
-  6443  CDB062        			CALL	STCMD
-  6446  2030          			JR		NZ,CMDSV3
+  644A  3E74          			LD		A,74H            ;コマンド74Hを送信
+  644C  CDB062        			CALL	STCMD
+  644F  2030          			JR		NZ,CMDSV3
                       	
-  6448  21CE64        			LD		HL,MSG_WR        ;WRITING表示
-  644B  CDED52        			CALL	MSGOUT
+  6451  21D764        			LD		HL,MSG_WR        ;WRITING表示
+  6454  CDED52        			CALL	MSGOUT
                       	
-  644E  CD865B        			CALL	RENUM9           ;BASICプログラムSAVE前処理
-  6451  2A54EB        			LD		HL,(BASSRT)      ;BASSRTからVARBGN-1までを送信
-  6454  7D            			LD		A,L
-  6455  CD3E60        			CALL	SNDBYTE
-  6458  7C            			LD		A,H
-  6459  CD3E60        			CALL	SNDBYTE
-  645C  ED5BA0EF      			LD		DE,(VARBGN)
-  6460  1B            			DEC		DE
-  6461  7B            			LD		A,E
+  6457  CD865B        			CALL	RENUM9           ;BASICプログラムSAVE前処理
+  645A  2A54EB        			LD		HL,(BASSRT)      ;BASSRTからVARBGN-1までを送信
+  645D  7D            			LD		A,L
+  645E  CD3E60        			CALL	SNDBYTE
+  6461  7C            			LD		A,H
   6462  CD3E60        			CALL	SNDBYTE
-  6465  7A            			LD		A,D
-  6466  CD3E60        			CALL	SNDBYTE
-  6469  7E            	CMDSV1:	LD		A,(HL)
-  646A  CD3E60        			CALL	SNDBYTE
-  646D  7C            			LD		A,H
-  646E  BA            			CP		D
-  646F  2004          			JR		NZ,CMDSV2
-  6471  7D            			LD		A,L
-  6472  BB            			CP		E
-  6473  2803          			JR		Z,CMDSV3         ;HL = DE までLOOP
-  6475  23            	CMDSV2:	INC		HL
-  6476  18F1          			JR		CMDSV1
+  6465  ED5BA0EF      			LD		DE,(VARBGN)
+  6469  1B            			DEC		DE
+  646A  7B            			LD		A,E
+  646B  CD3E60        			CALL	SNDBYTE
+  646E  7A            			LD		A,D
+  646F  CD3E60        			CALL	SNDBYTE
+  6472  7E            	CMDSV1:	LD		A,(HL)
+  6473  CD3E60        			CALL	SNDBYTE
+  6476  7C            			LD		A,H
+  6477  BA            			CP		D
+  6478  2004          			JR		NZ,CMDSV2
+  647A  7D            			LD		A,L
+  647B  BB            			CP		E
+  647C  2803          			JR		Z,CMDSV3         ;HL = DE までLOOP
+  647E  23            	CMDSV2:	INC		HL
+  647F  18F1          			JR		CMDSV1
                       			
-  6478                	CMDSV3:
-  6478  21C864        			LD		HL,MSG_OK        ;OK表示
-  647B  CDED52        			CALL	MSGOUT
-  647E  C9            			RET
+  6481                	CMDSV3:
+  6481  21D164        			LD		HL,MSG_OK        ;OK表示
+  6484  CDED52        			CALL	MSGOUT
+  6487  C9            			RET
                       	
                       	;************ BASIC FILES ********************
-  647F                	CMDFILES:
-  647F  E5            			PUSH	HL
-  6480  21B264        			LD		HL,FMSG          ;FILESの後ろにファイル名検索文字を指定すると構文エラーになるため、別行として入力
-  6483  CDED52        			CALL	MSGOUT
-  6486  CD7E1B        			CALL	LINPUT
-  6489  23            			INC		HL
-  648A  CD6763        			CALL	STFN             ;入力文字列取得
-  648D  EB            			EX		DE,HL
-  648E  219E66        			LD		HL,DEFDIR2       ;行頭に'LOAD 'を付けることでカーソルを移動させリターンで実行できるように
-  6491  010600        			LD		BC,D2END-DEFDIR2
-  6494  CDA361        			CALL	DIRLIST          ;DIRLIST本体をコール
-  6497  E1            			POP		HL
-  6498  C9            			RET
+  6488                	CMDFILES:
+  6488  E5            			PUSH	HL
+  6489  21BB64        			LD		HL,FMSG          ;FILESの後ろにファイル名検索文字を指定すると構文エラーになるため、別行として入力
+  648C  CDED52        			CALL	MSGOUT
+  648F  CD7E1B        			CALL	LINPUT
+  6492  23            			INC		HL
+  6493  CD6763        			CALL	STFN             ;入力文字列取得
+  6496  EB            			EX		DE,HL
+  6497  21B966        			LD		HL,DEFDIR2       ;行頭に'LOAD 'を付けることでカーソルを移動させリターンで実行できるように
+  649A  010600        			LD		BC,D2END-DEFDIR2
+  649D  CDA361        			CALL	DIRLIST          ;DIRLIST本体をコール
+  64A0  E1            			POP		HL
+  64A1  C9            			RET
                       			
                       	;************ BASIC KILL ***************************
-  6499                	CMDKILL:
-  6499  3E75          			LD		A,75H            ;コマンド75Hを送信
-  649B  CDB062        			CALL	STCMD
-  649E  2011          			JR		NZ,CMDKL4        ;ファイル名が送信できなかった。
-  64A0  CD2B60        			CALL	RCVBYTE
-  64A3  A7            			AND		A
-  64A4  2008          			JR		NZ,CMDKL3        ;ファイルが存在しない
-  64A6  21D764        			LD		HL,MSG_KL
-  64A9  CDED52        			CALL	MSGOUT
-  64AC  1803          			JR		CMDKL4
-  64AE  CD8A63        	CMDKL3:	CALL	SDERR
-  64B1                	CMDKL4:
-  64B1  C9            			RET
+  64A2                	CMDKILL:
+  64A2  3E75          			LD		A,75H            ;コマンド75Hを送信
+  64A4  CDB062        			CALL	STCMD
+  64A7  2011          			JR		NZ,CMDKL4        ;ファイル名が送信できなかった。
+  64A9  CD2B60        			CALL	RCVBYTE
+  64AC  A7            			AND		A
+  64AD  2008          			JR		NZ,CMDKL3        ;ファイルが存在しない
+  64AF  21E064        			LD		HL,MSG_KL
+  64B2  CDED52        			CALL	MSGOUT
+  64B5  1803          			JR		CMDKL4
+  64B7  CD8A63        	CMDKL3:	CALL	SDERR
+  64BA                	CMDKL4:
+  64BA  C9            			RET
                       			
-  64B2  46494C45205345	FMSG	DEFB	'FILE SEARCH:',00H
+  64BB  46494C45205345	FMSG	DEFB	'FILE SEARCH:',00H
                       	
-  64BF                	MSG_LD:
-  64BF  4C4F4144494E47			DB		'LOADING '
-  64C7  00            			DB		00H
+  64C8                	MSG_LD:
+  64C8  4C4F4144494E47			DB		'LOADING '
+  64D0  00            			DB		00H
                       	
-  64C8                	MSG_OK:
-  64C8  4F4B21        			DB		'OK!'
-  64CB  0D0A00        			DB		0DH,0AH,00H
+  64D1                	MSG_OK:
+  64D1  4F4B21        			DB		'OK!'
+  64D4  0D0A00        			DB		0DH,0AH,00H
                       	
-  64CE                	MSG_WR:
-  64CE  57524954494E47			DB		'WRITING '
-  64D6  00            			DB		00H
+  64D7                	MSG_WR:
+  64D7  57524954494E47			DB		'WRITING '
+  64DF  00            			DB		00H
                       	
-  64D7                	MSG_KL:
-  64D7  46494C45204445			DB		'FILE DELETED!'
-  64E4  0D0A00        			DB		0DH,0AH,00H
+  64E0                	MSG_KL:
+  64E0  46494C45204445			DB		'FILE DELETED!'
+  64ED  0D0A00        			DB		0DH,0AH,00H
                       	
-  64E7                	MSG_AD1:
-  64E7  41445253202B30			DB		'ADRS +0 +1 +2 +3 +4 +5 +6 +7 01234567'
-  650C  0D0A00        			DB		0DH,0AH,00H
+  64F0                	MSG_AD1:
+  64F0  41445253202B30			DB		'ADRS +0 +1 +2 +3 +4 +5 +6 +7 01234567'
+  6515  0D0A00        			DB		0DH,0AH,00H
                       			
-  650F                	MSG_AD2:
-  650F  4E4558543A414E			DB		'NEXT:ANY BACK:B BREAK:ESC'
-  6528  0D0A00        			DB		0DH,0AH,00H
+  6518                	MSG_AD2:
+  6518  4E4558543A414E			DB		'NEXT:ANY BACK:B BREAK:ESC'
+  6531  0D0A00        			DB		0DH,0AH,00H
                       			
-  652B                	MSG_KEY1:
-  652B  4E4558543A414E			DB		'NEXT:ANY BACK:B BREAK:'
-  6541  00            			DB		00H
-  6542                	MSG_KEY2:
-  6542  204F5220455343			DB		' OR ESC'
-  6549  00            			DB		00H
+  6534                	MSG_KEY1:
+  6534  4E4558543A414E			DB		'NEXT:ANY BACK:B BREAK:'
+  654A  00            			DB		00H
+  654B                	MSG_KEY2:
+  654B  204F5220455343			DB		' OR ESC'
+  6552  00            			DB		00H
                       	
-  654A                	MSG_FNAME:
-  654A  504152414D4554			DB		'PARAMETAR FAILED!'
-  655B  00            			DB		00H
+  6553                	MSG_FNAME:
+  6553  504152414D4554			DB		'PARAMETAR FAILED!'
+  6564  00            			DB		00H
                       			
-  655C                	MSG_CMD:
-  655C  434F4D4D414E44			DB		'COMMAND FAILED!',0DH,0AH
-  656D  20422020202020			DB		' B             : Return Basic',0DH,0AH
-  658C  2044206E6E6E6E			DB		' D nnnn        : Memory Dump',0DH,0AH
-  65AA  20462078202020			DB		' F x           : Find SD File',0DH,0AH
-  65C9  2047206E6E6E6E			DB		' G nnnn        : Exec Program',0DH,0AH
-  65E8  204C2078202020			DB		' L x           : Load From SD',0DH,0AH
-  6607  2053206E6E6E6E			DB		' S nnnn nn..   : Memory Write',0DH,0AH
-  6626  2057206E6E6E6E			DB		' W nnnn nnnn x : Save To SD'
-  6641  00            			DB		00H
+  6565                	MSG_CMD:
+  6565  434F4D4D414E44			DB		'COMMAND FAILED!',0DH,0AH
+  6576  20422020202020			DB		' B             : Return Basic',0DH,0AH
+  6595  2044206E6E6E6E			DB		' D nnnn        : Memory Dump',0DH,0AH
+  65B3  20462078202020			DB		' F x           : Find SD File',0DH,0AH
+  65D2  2047206E6E6E6E			DB		' G nnnn        : Exec Program',0DH,0AH
+  65F1  204C2078202020			DB		' L x           : Load From SD',0DH,0AH
+  6610  2053206E6E6E6E			DB		' S nnnn nn..   : Memory Write',0DH,0AH
+  662F  2057206E6E6E6E			DB		' W nnnn nnnn x : Save To SD'
+  664A  00            			DB		00H
                       			
-  6642                	MSG_F0:
-  6642  53442D43415244			DB		'SD-CARD INITIALIZE ERROR'
-  665A  00            			DB		00H
+  664B                	MSG_F0:
+  664B  53442D43415244			DB		'SD-CARD INITIALIZE ERROR'
+  6663  00            			DB		00H
                       			
-  665B                	MSG_F1:
-  665B  4E4F542046494E			DB		'NOT FIND FILE'
-  6668  00            			DB		00H
+  6664                	MSG_F1:
+  6664  4E4F542046494E			DB		'NOT FIND FILE'
+  6671  00            			DB		00H
                       			
-  6669                	MSG_F2:
-  6669  4E4F54204F424A			DB		'NOT OBJECT FILE'
-  6678  00            			DB		00H
+  6672                	MSG_F2:
+  6672  4E4F54204F424A			DB		'NOT OBJECT FILE'
+  6681  00            			DB		00H
                       			
-  6679                	MSG_F3:
-  6679  46494C45204558			DB		'FILE EXIST'
-  6683  00            			DB		00H
+  6682                	MSG_F3:
+  6682  46494C45204558			DB		'FILE EXIST'
+  668C  00            			DB		00H
                       			
-  6684                	MSG_F5:
-  6684  4E4F2050524F47			DB		'NO PROGRAM!!'
-  6690  00            			DB		00H
+  668D                	MSG_F5:
+  668D  4E4F2050524F47			DB		'NO PROGRAM!!'
+  6699  00            			DB		00H
                       			
-  6691                	MSG99:
-  6691  204552524F52  			DB		' ERROR'
-  6697  00            			DB		00H
+  669A                	MSG_F6:
+  669A  4E4F5420424153			DB		'NOT BASIC PROGRAM'
+  66AB  00            			DB		00H
                       			
-  6698  2A53          	MSG_FDW:	DB		'*S'
-  669A  00            			DB		00H
+  66AC                	MSG99:
+  66AC  204552524F52  			DB		' ERROR'
+  66B2  00            			DB		00H
+                      			
+  66B3  2A53          	MSG_FDW:	DB		'*S'
+  66B5  00            			DB		00H
                       	
-  669B                	DEFDIR:
-  669B  2A4C20        			DB		'*L '
-  669E                	DEND:
+  66B6                	DEFDIR:
+  66B6  2A4C20        			DB		'*L '
+  66B9                	DEND:
                       	
-  669E                	DEFDIR2:
-  669E  4C4F41442022  			DB		'LOAD ',22H
-  66A4                	D2END:
+  66B9                	DEFDIR2:
+  66B9  4C4F41442022  			DB		'LOAD ',22H
+  66BF                	D2END:
                       	
                       	
   7FFC                			ORG		7FFCH

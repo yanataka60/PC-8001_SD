@@ -649,6 +649,9 @@ CMDLOAD:
 		CALL	RCVBYTE          ;ヘッダー受信
 		CP		0D3H             ;D3Hでなければエラー
 		JR		Z,CMDLD
+		LD		HL,MSG_F6        ;NOT BASIC PROGRAM
+		CALL	MSGOUT
+		CALL	MONCLF
 		RET
 		
 CMDLD:	
@@ -835,6 +838,10 @@ MSG_F3:
 		
 MSG_F5:
 		DB		'NO PROGRAM!!'
+		DB		00H
+		
+MSG_F6:
+		DB		'NOT BASIC PROGRAM'
 		DB		00H
 		
 MSG99:
