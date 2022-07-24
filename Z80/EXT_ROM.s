@@ -1,3 +1,5 @@
+;2022.7.24 FILESでSYNTAX ERRORとなる事象を回避、SERCH FILEと聞いてくる仕様を削除
+
 CONOUT		EQU		0257H
 CSR			EQU		03A9H
 CSRADR		EQU		03F3H
@@ -335,7 +337,11 @@ STLT1:	LD		A,(DE)
 		JR		NZ,STLT2
 		XOR		A
 STLT2:	CALL	AZLCNV            ;大文字に変換
-		CALL	SNDBYTE           ;ファイルネーム検索文字列を送信
+		CP		22H               ;ダブルコーテーション読み飛ばし
+		JR		NZ,STLT3
+		INC		DE
+		JR		STLT1
+STLT3:	CALL	SNDBYTE           ;ファイルネーム検索文字列を送信
 		INC		DE
 		DEC		B
 		JR		NZ,STLT1
@@ -572,14 +578,16 @@ TWHEX2:
 		POP		HL
 		RET
 
-;****** FILE NAMEが取得できるまでスペースを読み飛ばし (IN:HL コマンド文字の次の文字 OUT:HL ファイルネームの先頭)*********
+;****** FILE NAMEが取得できるまでスペース、ダブルコーテーションを読み飛ばし (IN:HL コマンド文字の次の文字 OUT:HL ファイルネームの先頭)*********
 STFN:	PUSH	AF
 STFN1:	LD		A,(HL)
 		CP		20H
-		JR		NZ,STFN2
-		INC		HL               ;ファイルネームまでスペース読み飛ばし
+		JR		Z,STFN2
+		CP		22H
+		JR		NZ,STFN3
+STFN2:	INC		HL               ;ファイルネームまでスペース読み飛ばし
 		JR		STFN1
-STFN2:	POP		AF
+STFN3:	POP		AF
 		RET
 
 STSV2:                           ;ファイルネームの取得に失敗
@@ -589,7 +597,11 @@ STSV2:                           ;ファイルネームの取得に失敗
 ;**** ファイルネーム送信(IN:HL ファイルネームの先頭) ******
 STFS:	LD		B,20H
 STFS1:	LD		A,(HL)           ;FNAME送信
-		CALL	SNDBYTE
+		CP		22H
+		JR		NZ,STFS2
+		INC		HL
+		JR		STFS1
+STFS2:	CALL	SNDBYTE
 		INC		HL
 		DEC		B
 		JR		NZ,STFS1
@@ -638,6 +650,7 @@ ERRMSG:	CALL	MSGOUT
 
 ;************** BASIC CMT LOAD *********************
 CMDLOAD:
+		DEC		HL
 		LD		A,73H            ;コマンド73Hを送信
 		CALL	STCMD
 		JR		NZ,CMDLD8
@@ -707,6 +720,7 @@ CMDSAVE:
 		LD		A,0F5H           ;BASICプログラムが1行もなければエラー
 		JP		Z,SDERR
 
+		DEC		HL
 		LD		A,74H            ;コマンド74Hを送信
 		CALL	STCMD
 		JR		NZ,CMDSV3
@@ -744,17 +758,21 @@ CMDSV3:
 
 ;************ BASIC FILES ********************
 CMDFILES:
-		PUSH	HL
-		LD		HL,FMSG          ;FILESの後ろにファイル名検索文字を指定すると構文エラーになるため、別行として入力
-		CALL	MSGOUT
-		CALL	LINPUT
-		INC		HL
+;2022.7.24 SYNTAX ERROR回避により、廃止
+;		PUSH	HL
+;		LD		HL,FMSG          ;FILESの後ろにファイル名検索文字を指定すると構文エラーになるため、別行として入力
+;		CALL	MSGOUT
+;		CALL	LINPUT
+;		INC		HL
 		CALL	STFN             ;入力文字列取得
 		EX		DE,HL
 		LD		HL,DEFDIR2       ;行頭に'LOAD 'を付けることでカーソルを移動させリターンで実行できるように
 		LD		BC,D2END-DEFDIR2
 		CALL	DIRLIST          ;DIRLIST本体をコール
-		POP		HL
+;2022.7.24 SYNTAX ERROR回避
+		LD		HL,FMSG         ;SYNTAX ERROR回避
+		CALL	MSGOUT
+;		POP		HL
 		RET
 		
 ;************ BASIC KILL ***************************
@@ -772,7 +790,8 @@ CMDKL3:	CALL	SDERR
 CMDKL4:
 		RET
 		
-FMSG	DEFB	'FILE SEARCH:',00H
+;FMSG	DEFB	'FILE SEARCH:'
+FMSG:	DEFB	00H
 
 MSG_LD:
 		DB		'LOADING '
