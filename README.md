@@ -77,7 +77,7 @@
 
 ## 接続
 　PC-8001本体後ろの拡張端子に接続します。
-### フラットケーブルによる接続（写真の基板は、Rev1.0ですが接続方法はRev1.1も同じです。）
+### フラットケーブルによる接続
 ![Flat cable1](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/PC-8001_SD(3).JPG)
 ![Flat cable2](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/PC-8001_SD(5).JPG)
 
