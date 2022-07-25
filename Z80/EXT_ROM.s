@@ -1,4 +1,5 @@
 ;2022.7.24 FILESでSYNTAX ERRORとなる事象を回避、SERCH FILEと聞いてくる仕様を削除
+;2022.7.25 FILESを↑キーで打ち切ったとき時々Syntax Errorが発生するため2行戻す動きを廃止
 
 CONOUT		EQU		0257H
 CSR			EQU		03A9H
@@ -409,10 +410,11 @@ DL6:	CALL	KYSCAN            ;1文字入力待ち
 		JR		Z,DL8
 		XOR		A                 ;それ以外で継続
 		JR		DL8
-DL9:	LD		A,1EH
-		CALL	CONOUT
-		LD		A,1EH
-		CALL	CONOUT            ;カーソル↑で打ち切ったときにカーソル2行上へ
+DL9:
+;		LD		A,1EH             ;時々Syntax Errorが発生するため廃止
+;		CALL	CONOUT
+;		LD		A,1EH
+;		CALL	CONOUT            ;カーソル↑で打ち切ったときにカーソル2行上へ
 DL7:	LD		A,0FFH            ;0FFH中断コードを送信
 DL8:	CALL	SNDBYTE
 		JP		DL2
