@@ -820,7 +820,7 @@ U 1 1 6188B7C4
 P 13950 2200
 F 0 "J2" H 13450 2900 50  0000 L CNN
 F 1 "Micro_SD_Card_Kit" H 13950 2900 50  0000 L CNN
-F 2 "MZ80k_SD:AE-microSD-LLCNV" H 15100 2500 50  0001 C CNN
+F 2 "Kicad:AE-microSD-LLCNV" H 15100 2500 50  0001 C CNN
 F 3 "http://katalog.we-online.de/em/datasheet/693072010801.pdf" H 13950 2200 50  0001 C CNN
 	1    13950 2200
 	1    0    0    -1  
@@ -1003,7 +1003,7 @@ U 1 1 61A254A8
 P 12300 4800
 F 0 "U6" H 12300 5689 60  0000 C CNN
 F 1 "Arduino_Pro_Mini_5V" H 12300 5583 60  0000 C CNN
-F 2 "MZ80k_SD:Arduino_Pro_Mini" H 13100 4050 60  0001 C CNN
+F 2 "Kicad:Arduino_Pro_Mini" H 13100 4050 60  0001 C CNN
 F 3 "https://www.sparkfun.com/products/11113" H 12500 3600 60  0001 C CNN
 	1    12300 4800
 	1    0    0    -1  

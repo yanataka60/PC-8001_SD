@@ -1,4 +1,4 @@
-19115641552802565
+19118889822012417
 Battery
 BatteryHolder_Bulgin_BX0036_1xC
 Bulgin Battery Holder, BX0036, Battery Type C (https://www.bulgin.com/products/pub/media/bulgin/data/Battery_holders.pdf)
@@ -55243,6 +55243,20 @@ solder jumper open
 0
 5
 3
+Kicad
+AE-microSD-LLCNV
+Through hole straight pin header, 1x09, 2.54mm pitch, single row
+Through hole pin header THT 1x09 2.54mm single row
+0
+13
+9
+Kicad
+Arduino_Pro_Mini
+Arduino Pro Mini
+Arduino Pro Mini
+0
+28
+28
 LED_SMD
 LED-APA102-2020
 http://www.led-color.com/upload/201604/APA102-2020%20SMD%20LED.pdf

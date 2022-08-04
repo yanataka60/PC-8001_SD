@@ -52,10 +52,10 @@ F 3 "" H 7400 3850 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:C C2
+L Device:C C5
 U 1 1 61E99EF6
 P 7050 3850
-F 0 "C2" V 6900 3950 50  0000 C CNN
+F 0 "C5" V 6900 3950 50  0000 C CNN
 F 1 "0.1uF" V 6900 3700 50  0000 C CNN
 F 2 "Capacitor_THT:C_Rect_L4.0mm_W2.5mm_P2.50mm" H 7088 3700 50  0001 C CNN
 F 3 "~" H 7050 3850 50  0001 C CNN
@@ -140,10 +140,10 @@ F 3 "" H 2950 8500 50  0001 C CNN
 $EndComp
 Connection ~ 7400 1700
 $Comp
-L Memory_EPROM:27C64 U2
+L Memory_EPROM:27C64 U5
 U 1 1 61A4CF3B
 P 7400 2700
-F 0 "U2" H 7200 3650 50  0000 C CNN
+F 0 "U5" H 7200 3650 50  0000 C CNN
 F 1 "2764" H 7600 3650 50  0000 C CNN
 F 2 "Package_DIP:DIP-28_W15.24mm_LongPads" H 7400 2700 50  0001 C CNN
 F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/11107M.pdf" H 7400 2700 50  0001 C CNN
@@ -168,10 +168,10 @@ Wire Wire Line
 	6600 3600 7000 3600
 Connection ~ 6600 6900
 $Comp
-L 74xx:74LS30 U5
+L 74xx:74LS30 U3
 U 1 1 620D1DFE
 P 6100 5000
-F 0 "U5" H 6450 5100 50  0000 C CNN
+F 0 "U3" H 6450 5100 50  0000 C CNN
 F 1 "74LS30" H 6400 4900 50  0000 C CNN
 F 2 "Package_DIP:DIP-14_W7.62mm_LongPads" H 6100 5000 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74LS30" H 6100 5000 50  0001 C CNN
@@ -225,10 +225,10 @@ Wire Wire Line
 Wire Wire Line
 	6700 5000 6700 3500
 $Comp
-L 74xx:74LS30 U6
+L 74xx:74LS30 U3
 U 2 1 621D8C3B
 P 10050 8200
-F 0 "U6" H 10280 8246 50  0000 L CNN
+F 0 "U3" H 10280 8246 50  0000 L CNN
 F 1 "74LS30" H 10280 8155 50  0000 L CNN
 F 2 "Package_DIP:DIP-14_W7.62mm_LongPads" H 10050 8200 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74LS30" H 10050 8200 50  0001 C CNN
@@ -236,10 +236,10 @@ F 3 "http://www.ti.com/lit/gpn/sn74LS30" H 10050 8200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L 74xx:74LS30 U6
+L 74xx:74LS30 U2
 U 1 1 621DA5E3
 P 7250 6050
-F 0 "U6" H 7250 6575 50  0000 C CNN
+F 0 "U2" H 7250 6575 50  0000 C CNN
 F 1 "74LS30" H 7250 6484 50  0000 C CNN
 F 2 "Package_DIP:DIP-14_W7.62mm_LongPads" H 7250 6050 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74LS30" H 7250 6050 50  0001 C CNN
@@ -247,10 +247,10 @@ F 3 "http://www.ti.com/lit/gpn/sn74LS30" H 7250 6050 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L 74xx:74LS30 U5
+L 74xx:74LS30 U2
 U 2 1 621FB49F
 P 8950 8200
-F 0 "U5" H 9180 8246 50  0000 L CNN
+F 0 "U2" H 9180 8246 50  0000 L CNN
 F 1 "74LS30" H 9180 8155 50  0000 L CNN
 F 2 "Package_DIP:DIP-14_W7.62mm_LongPads" H 8950 8200 50  0001 C CNN
 F 3 "http://www.ti.com/lit/gpn/sn74LS30" H 8950 8200 50  0001 C CNN
@@ -271,12 +271,12 @@ $EndComp
 $Comp
 L 74xx:74LS04 U1
 U 6 1 6232F73D
-P 6200 6550
-F 0 "U1" H 6400 6300 50  0000 C CNN
-F 1 "74LS04" H 6050 6300 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm_LongPads" H 6200 6550 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 6200 6550 50  0001 C CNN
-	6    6200 6550
+P 9300 3700
+F 0 "U1" H 9500 3450 50  0000 C CNN
+F 1 "74LS04" H 9150 3450 50  0000 C CNN
+F 2 "Package_DIP:DIP-14_W7.62mm_LongPads" H 9300 3700 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 9300 3700 50  0001 C CNN
+	6    9300 3700
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
@@ -320,10 +320,10 @@ F 3 "~" H 7400 8250 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L Device:C C4
+L Device:C C2
 U 1 1 628E1651
 P 8500 8250
-F 0 "C4" V 8350 8350 50  0000 C CNN
+F 0 "C2" V 8350 8350 50  0000 C CNN
 F 1 "0.1uF" V 8350 8100 50  0000 C CNN
 F 2 "Capacitor_THT:C_Rect_L4.0mm_W2.5mm_P2.50mm" H 8538 8100 50  0001 C CNN
 F 3 "~" H 8500 8250 50  0001 C CNN
@@ -331,10 +331,10 @@ F 3 "~" H 8500 8250 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L Device:C C5
+L Device:C C3
 U 1 1 62902A84
 P 9650 8250
-F 0 "C5" V 9500 8350 50  0000 C CNN
+F 0 "C3" V 9500 8350 50  0000 C CNN
 F 1 "0.1uF" V 9500 8100 50  0000 C CNN
 F 2 "Capacitor_THT:C_Rect_L4.0mm_W2.5mm_P2.50mm" H 9688 8100 50  0001 C CNN
 F 3 "~" H 9650 8250 50  0001 C CNN
@@ -580,12 +580,12 @@ Wire Wire Line
 $Comp
 L 74xx:74LS04 U1
 U 4 1 63D902FA
-P 5000 4550
-F 0 "U1" H 5000 4867 50  0000 C CNN
-F 1 "74LS04" H 5000 4776 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm_LongPads" H 5000 4550 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 5000 4550 50  0001 C CNN
-	4    5000 4550
+P 6200 6550
+F 0 "U1" H 6200 6867 50  0000 C CNN
+F 1 "74LS04" H 6200 6776 50  0000 C CNN
+F 2 "Package_DIP:DIP-14_W7.62mm_LongPads" H 6200 6550 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 6200 6550 50  0001 C CNN
+	4    6200 6550
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -677,12 +677,12 @@ Wire Wire Line
 $Comp
 L 74xx:74LS04 U1
 U 3 1 6232C3F4
-P 9300 3700
-F 0 "U1" H 9150 3900 50  0000 C CNN
-F 1 "74LS04" H 9400 3900 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm_LongPads" H 9300 3700 50  0001 C CNN
-F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 9300 3700 50  0001 C CNN
-	3    9300 3700
+P 5000 4550
+F 0 "U1" H 4850 4750 50  0000 C CNN
+F 1 "74LS04" H 5100 4750 50  0000 C CNN
+F 2 "Package_DIP:DIP-14_W7.62mm_LongPads" H 5000 4550 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 5000 4550 50  0001 C CNN
+	3    5000 4550
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
@@ -976,10 +976,10 @@ F 3 "" H 10450 6700 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:C C3
+L Device:C C4
 U 1 1 61F2D5C6
 P 9950 6650
-F 0 "C3" V 9800 6750 50  0000 C CNN
+F 0 "C4" V 9800 6750 50  0000 C CNN
 F 1 "0.1uF" V 9800 6500 50  0000 C CNN
 F 2 "Capacitor_THT:C_Rect_L4.0mm_W2.5mm_P2.50mm" H 9988 6500 50  0001 C CNN
 F 3 "~" H 9950 6650 50  0001 C CNN
@@ -987,10 +987,10 @@ F 3 "~" H 9950 6650 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L Interface:8255 U3
+L Interface:8255 U4
 U 1 1 618A36EE
 P 10450 5000
-F 0 "U3" H 10050 6500 50  0000 C CNN
+F 0 "U4" H 10050 6500 50  0000 C CNN
 F 1 "8255" H 10850 6500 50  0000 C CNN
 F 2 "Package_DIP:DIP-40_W15.24mm_LongPads" H 10450 5300 50  0001 C CNN
 F 3 "http://aturing.umcs.maine.edu/~meadow/courses/cos335/Intel8255A.pdf" H 10450 5300 50  0001 C CNN
@@ -998,10 +998,10 @@ F 3 "http://aturing.umcs.maine.edu/~meadow/courses/cos335/Intel8255A.pdf" H 1045
 	1    0    0    -1  
 $EndComp
 $Comp
-L Arduino:Arduino_Pro_Mini U4
+L Arduino:Arduino_Pro_Mini U6
 U 1 1 61A254A8
 P 12300 4800
-F 0 "U4" H 12300 5689 60  0000 C CNN
+F 0 "U6" H 12300 5689 60  0000 C CNN
 F 1 "Arduino_Pro_Mini_5V" H 12300 5583 60  0000 C CNN
 F 2 "MZ80k_SD:Arduino_Pro_Mini" H 13100 4050 60  0001 C CNN
 F 3 "https://www.sparkfun.com/products/11113" H 12500 3600 60  0001 C CNN

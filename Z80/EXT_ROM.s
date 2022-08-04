@@ -1,40 +1,47 @@
 ;2022.7.24 FILESでSYNTAX ERRORとなる事象を回避、SERCH FILEと聞いてくる仕様を削除
 ;2022.7.25 FILESを↑キーで打ち切ったとき時々Syntax Errorが発生するため2行戻す動きを廃止
+;2022.8.4  BASIC戻り時のSyntax Error対策を修正
 
-CONOUT		EQU		0257H
-CSR			EQU		03A9H
-CSRADR		EQU		03F3H
-DSPCSR		EQU		0BE2H
-KYSCAN		EQU		0FACH
-LINPUT		EQU		1B7EH
-AFTLOAD		EQU		1F8BH
-CHROUT		EQU		40A6H
-MSGOUT		EQU		52EDH
-RENUM9		EQU		5B86H
-HEXCHK		EQU		5E39H
-BINCV4		EQU		5E4BH
-MONBHX		EQU		5E83H
-MONDME		EQU		5EBDH
-MONDHL		EQU		5EC0H
-AZLCNV		EQU		5FC1H
-MONCLF		EQU		5FCAH
-MONSPC		EQU		5FD4H
+CONOUT		EQU		0257H		;CRTへの1バイト出力
+DISPBL		EQU		0350H		;ベルコードの出力
+CSR			EQU		03A9H		;カーソルの移動
+CSRADR		EQU		03F3H		;キャラクタ座標->VRAMアドレス変換
+DSPCSR		EQU		0BE2H		;カーソル表示の開始
+KYSCAN		EQU		0FACH		;リアルタイム・キーボード・スキャニング
+LINPUT		EQU		1B7EH		;スクリーン・エディタ
+AFTLOAD		EQU		1F8BH		;BASICテキストの終了アドレス設定
+CHROUT		EQU		40A6H		;デバイスへの1バイト出力
+MSGOUT		EQU		52EDH		;文字列の出力2
+RENUM9		EQU		5B86H		;BASICプログラムSAVE前処理
+MONBGN		EQU		5C3CH		;MONITOR開始アドレス
+HEXCHK		EQU		5E39H		;16進コード・チェック
+BINCV4		EQU		5E4BH		;16進コードからバイナリ形式への変換
+MONBHX		EQU		5E83H		;8ビット数値から16進コードへの変換
+MONDME		EQU		5EBDH		;16進データ2桁表示
+MONDHL		EQU		5EC0H		;16進4桁表示
+AZLCNV		EQU		5FC1H		;小文字->大文字変換
+MONCLF		EQU		5FCAH		;CRコード及びLFコードの表示
+MONSPC		EQU		5FD4H		;スペースの表示
 
-CUSPOS		EQU		0EA63H
-BASSRT		EQU		0EB54H
-IBUF		EQU		0EC96H
-FILNAM		EQU		0EF3EH
-VARBGN		EQU		0EFA0H
-TBLOAD		EQU		0F139H
-TBKILL		EQU		0F142H
-TBSAVE		EQU		0F14BH
-TBFILES		EQU		0F14EH
+CUSPOS		EQU		0EA63H		;カーソル位置
+BASSRT		EQU		0EB54H		;プログラムテキスト開始位置
+IBUF		EQU		0EC96H		;キー入力バッファ
+FILNAM		EQU		0EF3EH		;現在ロード中ファイルネーム
+VARBGN		EQU		0EFA0H		;変数領域の始まりアドレス
+TBLOAD		EQU		0F139H		;LOADコマンドジャンプアドレス
+TBKILL		EQU		0F142H		;KILLコマンドジャンプアドレス
+TBSAVE		EQU		0F14BH		;SAVEコマンドジャンプアドレス
+TBFILES		EQU		0F14EH		;FILESコマンドジャンプアドレス
 MONHL		EQU		0FF34H
 MONSP		EQU		0FF36H
 SADRS		EQU		0FF3DH
 EADRS		EQU		0FF41H
 LBUF		EQU		0FF66H
 
+PPI_A		EQU		0FCH
+PPI_B		EQU		PPI_A+1
+PPI_C		EQU		PPI_A+2
+PPI_R		EQU		PPI_A+3
 
 ;8255 PORT アドレス FCH～FFH
 ;0FCH PORTA 送信データ(下位4ビット)
@@ -67,14 +74,14 @@ LBUF		EQU		0FF66H
 ;**** 8255初期化 ****
 ;PORTC下位BITをOUTPUT、上位BITをINPUT、PORTBをINPUT、PORTAをOUTPUT
 INIT:	LD		A,8AH
-		OUT		(0FFH),A
+		OUT		(PPI_R),A
 ;出力BITをリセット
 		XOR		A                 ;PORTA <- 0
-		OUT		(0FCH),A
-		OUT		(0FEH),A          ;PORTC <- 0
+		OUT		(PPI_A),A
+		OUT		(PPI_C),A         ;PORTC <- 0
 
 ;LOAD、SAVE、FILES、KILLのジャンプ先を設定
-		LD		HL,CMDLOAD
+INI2:	LD		HL,CMDLOAD
 		LD		(TBLOAD),HL
 
 		LD		HL,CMDSAVE
@@ -86,19 +93,19 @@ INIT:	LD		A,8AH
 		LD		HL,CMDKILL
 		LD		(TBKILL),HL
 
-		RET
+INI3:	RET
 
 ;**** 1BYTE受信 ****
 ;受信DATAをAレジスタにセットしてリターン
 RCVBYTE:
 		CALL	F1CHK             ;PORTC BIT7が1になるまでLOOP
-		IN		A,(0FDH)          ;PORTB -> A
+		IN		A,(PPI_B)         ;PORTB -> A
 		PUSH 	AF
 		LD		A,05H
-		OUT		(0FFH),A          ;PORTC BIT2 <- 1
+		OUT		(PPI_R),A         ;PORTC BIT2 <- 1
 		CALL	F2CHK             ;PORTC BIT7が0になるまでLOOP
 		LD		A,04H
-		OUT		(0FFH),A          ;PORTC BIT2 <- 0
+		OUT		(PPI_R),A         ;PORTC BIT2 <- 0
 		POP 	AF
 		RET
 		
@@ -120,25 +127,25 @@ SNDBYTE:
 ;**** 4BIT送信 ****
 ;Aレジスタ下位4ビットを送信する
 SND4BIT:
-		OUT		(0FCH),A
+		OUT		(PPI_A),A
 		LD		A,05H
-		OUT		(0FFH),A          ;PORTC BIT2 <- 1
+		OUT		(PPI_R),A          ;PORTC BIT2 <- 1
 		CALL	F1CHK             ;PORTC BIT7が1になるまでLOOP
 		LD		A,04H
-		OUT		(0FFH),A          ;PORTC BIT2 <- 0
+		OUT		(PPI_R),A          ;PORTC BIT2 <- 0
 		CALL	F2CHK
 		RET
 		
 ;**** BUSYをCHECK(1) ****
 ; 82H BIT7が1になるまでLOP
-F1CHK:	IN		A,(0FEH)
+F1CHK:	IN		A,(PPI_C)
 		AND		80H               ;PORTC BIT7 = 1?
 		JR		Z,F1CHK
 		RET
 
 ;**** BUSYをCHECK(0) ****
 ; 82H BIT7が0になるまでLOOP
-F2CHK:	IN		A,(0FEH)
+F2CHK:	IN		A,(PPI_C)
 		AND		80H               ;PORTC BIT7 = 0?
 		JR		NZ,F2CHK
 		RET
@@ -405,12 +412,12 @@ DL6:	CALL	KYSCAN            ;1文字入力待ち
 		CP		1BH               ;ESCで打ち切り
 		JR		Z,DL7
 		CP		1EH               ;カーソル↑で打ち切り
-		JR		Z,DL9
+		JR		Z,DL7
 		CP		42H               ;「B」で前ページ
 		JR		Z,DL8
 		XOR		A                 ;それ以外で継続
 		JR		DL8
-DL9:
+;DL9:
 ;		LD		A,1EH             ;時々Syntax Errorが発生するため廃止
 ;		CALL	CONOUT
 ;		LD		A,1EH
@@ -438,6 +445,7 @@ MONLOAD:LD		A,71H            ;Lコマンド71Hを送信
 		LD		HL,MSG_F2        ;3AH以外ならエラー
 		CALL	MSGOUT
 		CALL	MONCLF
+		CALL	DISPBL
 		JP		CMD1
 		
 MCNLOAD:LD		HL,MSG_LD        ;LOADING表示
@@ -647,6 +655,7 @@ ERR99:	CALL	MONBHX
 		LD		HL,MSG99         ;その他ERROR
 ERRMSG:	CALL	MSGOUT
 		CALL	MONCLF
+		CALL	DISPBL
 		POP		AF
 		RET
 
@@ -667,7 +676,8 @@ CMDLOAD:
 		LD		HL,MSG_F6        ;NOT BASIC PROGRAM
 		CALL	MSGOUT
 		CALL	MONCLF
-		RET
+		CALL	DISPBL
+		JR		CMDLD8
 		
 CMDLD:	
 		LD		HL,FILNAM        ;CMTファイル中に記載のファイルネーム6文字を受信
@@ -707,9 +717,10 @@ CMDLD5:	DEC		B
 CMDLD6:	LD		BC,0007H         ;HLの位置を7つ戻してBASICプログラム終了位置とする
 		SBC		HL,BC
 		
-		JP		AFTLOAD          ;BASICプログラムLOAD後処理
+;		JP		AFTLOAD          ;BASICプログラムLOAD後処理
 CMDLD8:
-		RET
+		JR		RETBC2
+;		RET
 		
 ;********************** BASIC CMT SAVE **********************
 CMDSAVE:
@@ -720,12 +731,14 @@ CMDSAVE:
 		OR		(HL)
 		POP		HL
 		LD		A,0F5H           ;BASICプログラムが1行もなければエラー
-		JP		Z,SDERR
+		JR		Z,CMDKL3
+;		JP		Z,SDERR
 
 		DEC		HL
 		LD		A,74H            ;コマンド74Hを送信
 		CALL	STCMD
-		JR		NZ,CMDSV3
+		JR		NZ,CMDSV4
+;		JR		NZ,CMDSV3
 
 		LD		HL,MSG_WR        ;WRITING表示
 		CALL	MSGOUT
@@ -756,7 +769,8 @@ CMDSV2:	INC		HL
 CMDSV3:
 		LD		HL,MSG_OK        ;OK表示
 		CALL	MSGOUT
-		RET
+CMDSV4:	JR		RETBC
+;		RET
 
 ;************ BASIC FILES ********************
 CMDFILES:
@@ -771,29 +785,44 @@ CMDFILES:
 		LD		HL,DEFDIR2       ;行頭に'LOAD 'を付けることでカーソルを移動させリターンで実行できるように
 		LD		BC,D2END-DEFDIR2
 		CALL	DIRLIST          ;DIRLIST本体をコール
+;2022.8.4  SYNTAX ERROR回避
+		JR		RETBC
 ;2022.7.24 SYNTAX ERROR回避
-		LD		HL,FMSG         ;SYNTAX ERROR回避
-		CALL	MSGOUT
+;		LD		HL,FMSG         ;SYNTAX ERROR回避
+;		CALL	MSGOUT
 ;		POP		HL
-		RET
+;		RET
 		
 ;************ BASIC KILL ***************************
 CMDKILL:
 		LD		A,75H            ;コマンド75Hを送信
 		CALL	STCMD
-		JR		NZ,CMDKL4        ;ファイル名が送信できなかった。
+		JR		NZ,RETBC         ;ファイル名が送信できなかった。
+;		JR		NZ,CMDKL4        ;ファイル名が送信できなかった。
 		CALL	RCVBYTE
 		AND		A
 		JR		NZ,CMDKL3        ;ファイルが存在しない
 		LD		HL,MSG_KL
 		CALL	MSGOUT
-		JR		CMDKL4
+		CALL	DISPBL
+		JR		RETBC
+;		JR		CMDKL4
 CMDKL3:	CALL	SDERR
-CMDKL4:
-		RET
+
+;CMDKL4:
+;		RET
+
+;2022.8.4 SYNTAX ERROR回避 
+;FILES SAVE KILLからBASICへ正しい戻り方が判らなかったため、LOAD後処理で戻ることとする。
+RETBC:
+		LD		HL,(VARBGN)
+;		DEC		HL
+;LOAD後処理
+RETBC2:
+		JP		AFTLOAD          ;BASICプログラムLOAD後処理
 		
 ;FMSG	DEFB	'FILE SEARCH:'
-FMSG:	DEFB	00H
+;FMSG:	DEFB	00H
 
 MSG_LD:
 		DB		'LOADING '
