@@ -1,6 +1,11 @@
 ;2022.7.24 FILESでSYNTAX ERRORとなる事象を回避、SERCH FILEと聞いてくる仕様を削除
 ;2022.7.25 FILESを↑キーで打ち切ったとき時々Syntax Errorが発生するため2行戻す動きを廃止
 ;2022.8.4  BASIC戻り時のSyntax Error対策を修正
+;2022.8.14 MONITOR GコマンドでPOP BCが抜けていたので追加。
+;          mk2用と統合
+;            拡張ROM認識コードを041H,042H,00Hとした。
+;            SHIFTキーを押しながら起動することで拡張ROMを有効にするか選択できるようにした。(mk2用)
+;            mk2においてもfiles、save、killコマンドでSyntaxErrorが出ないように修正
 
 CONOUT		EQU		0257H		;CRTへの1バイト出力
 DISPBL		EQU		0350H		;ベルコードの出力
@@ -24,8 +29,10 @@ MONCLF		EQU		5FCAH		;CRコード及びLFコードの表示
 MONSPC		EQU		5FD4H		;スペースの表示
 
 CUSPOS		EQU		0EA63H		;カーソル位置
+FKDEF		EQU		0EAC0H		;AUTO START キー定義場所初期値
 BASSRT		EQU		0EB54H		;プログラムテキスト開始位置
 IBUF		EQU		0EC96H		;キー入力バッファ
+FKPINT		EQU		0EDC0H		;キーポインタ
 FILNAM		EQU		0EF3EH		;現在ロード中ファイルネーム
 VARBGN		EQU		0EFA0H		;変数領域の始まりアドレス
 TBLOAD		EQU		0F139H		;LOADコマンドジャンプアドレス
@@ -38,16 +45,30 @@ SADRS		EQU		0FF3DH
 EADRS		EQU		0FF41H
 LBUF		EQU		0FF66H
 
+;PC-8001
 PPI_A		EQU		0FCH
+;PC-8001mk2
+;PPI_A		EQU		07CH
+
 PPI_B		EQU		PPI_A+1
 PPI_C		EQU		PPI_A+2
 PPI_R		EQU		PPI_A+3
 
+;PC-8001
 ;8255 PORT アドレス FCH～FFH
 ;0FCH PORTA 送信データ(下位4ビット)
 ;0FDH PORTB 受信データ(8ビット)
+;PC-8001mk2
+;8255 PORT アドレス 7CH～7FH
+;7CH PORTA 送信データ(下位4ビット)
+;7DH PORTB 受信データ(8ビット)
+
 ;
+;PC-8001
 ;0FEH PORTC Bit
+;PC-8001mk2
+;7EH PORTC Bit
+
 ;7 IN  CHK
 ;6 IN
 ;5 IN
@@ -57,20 +78,36 @@ PPI_R		EQU		PPI_A+3
 ;1 OUT
 ;0 OUT
 ;
+;PC-8001
 ;0FFH コントロールレジスタ
+;PC-8001mk2
+;7FH コントロールレジスタ
+
 
 
         ORG		6000H
 
 		DB		041H,042H         ;拡張ROM認識コード
 
-		CALL	INIT              ;POWER ONで8255を初期化、LOAD、SAVE、FILES、KILLのジャンプ先を設定
-		RET
+		NOP
+		JR		INIT              ;POWER ONで8255を初期化、LOAD、SAVE、FILES、KILLのジャンプ先を設定
+		NOP
+;PC-8001mk2の作法に統一
+;		CALL	INIT              ;POWER ONで8255を初期化、LOAD、SAVE、FILES、KILLのジャンプ先を設定
+;		RET
 
 ;*********** OPENしているファイルから1BYTE読み出し転送 ****************
 ;5F9EH代替ルーチン
 		JP		D_5F9E
 
+;*********** CMT LOAD 直呼び出し (EMI PLAYER用) *****************************
+;5F3AH代替ルーチン
+		JP		D_5F3A
+
+;*********** MONITOR HOT START  (EMI PLAYER用) ********************
+;5C66H代替ルーチン
+		JP		MONHOT
+		
 ;**** 8255初期化 ****
 ;PORTC下位BITをOUTPUT、上位BITをINPUT、PORTBをINPUT、PORTAをOUTPUT
 INIT:	LD		A,8AH
@@ -79,6 +116,14 @@ INIT:	LD		A,8AH
 		XOR		A                 ;PORTA <- 0
 		OUT		(PPI_A),A
 		OUT		(PPI_C),A         ;PORTC <- 0
+
+		IN		A,(08H)
+		AND		40H
+;キースキャンしてSHIFTきーが押されていなければ通常起動
+;		RET		NZ
+
+;キースキャンしてSHIFTきーが押されていなければ拡張ROM起動
+		RET		Z
 
 ;LOAD、SAVE、FILES、KILLのジャンプ先を設定
 INI2:	LD		HL,CMDLOAD
@@ -154,12 +199,18 @@ F2CHK:	IN		A,(PPI_C)
 MONINI:	LD		(MONHL),HL
 		LD		(MONSP),SP
 		
+;************ (TBLOAD)にCMDLOADがセットされていなければMONBGNへジャンプして通常MONITOR起動 ***************
+		LD		HL,(TBLOAD)
+		LD		DE,CMDLOAD
+		SBC		HL,DE
+		JP		NZ,MONBGN
+
 ;		PUSH	HL                ;タイトルを表示するとBASICから戻ったときに自動実行が途切れてしまうため削除
 ;		LD		HL,MONMSG
 ;		CALL	MSGOUT
 ;		POP		HL
 		
-		LD		BC,MONERR         ;BASICに戻るときPOPしているのでお約束らしい
+CMD0:	LD		BC,MONERR         ;BASICに戻るときPOPしているのでお約束らしい
 		PUSH	BC
 CMD1:
 		LD		A,'*'
@@ -195,8 +246,18 @@ CMD2:
 		
 ;MONMSG:	DEFB	0CH,'**PC-8001_SD Monitor **',0DH,0AH,00H
 
+;*********** MONITOR HOT START  (EMI PLAYER用)  *******************************
+;5C66H代替ルーチン
+MONHOT:
+		LD		SP,(MONSP)
+		CALL	MONCLF
+		JR		CMD0
+
 ;************ Bコマンド BASIC復帰 ***********************
-MONCTB:	POP		BC
+MONCTB:
+;***** 2022.8.10 BUG修正 ***********
+		POP		BC
+;***********************************
 		LD		HL,(MONHL)
 		EI
 		RET
@@ -206,6 +267,8 @@ GOCMD:	INC		HL
 		CALL	STFN
 		CALL	HLHEX             ;4桁の16進数であればHLにセットして続行
 		JP		C,MONERR
+		CALL	MONCLF
+		POP		BC
 		JP		(HL)              ;HLの示すアドレスにジャンプ
 
 ;パラメータエラー処理
@@ -489,13 +552,22 @@ STCMD:	INC		HL
 		CALL	STCD             ;コマンドコード送信
 		POP		HL
 		AND		A                ;00以外ならERROR
-		JR		NZ,STCMD2
+		JP		NZ,SDERR
 		CALL	STFS             ;ファイルネーム送信
 		AND		A                ;00以外ならERROR
-		JP		NZ,STCMD2
+		JP		NZ,SDERR
 		RET
-STCMD2:	CALL	SDERR
-SRCMD3:	RET
+
+;************ 5F3AH READ FROM TAPEの代替 (EMI PLAYER用)*******************
+D_5F3A:
+;************ 連続してAUTO STARTをするためにフラグポイント再設定 (正解なのかは自信なし)************
+		LD		HL,FKDEF
+		LD		(FKPINT),HL
+;**************************************************************************************
+		
+;ファイル名指定なしとしてMONITOR Lコマンド実行 *********************
+		LD		HL,DEFCR-1
+		JP		MONLOAD
 
 ;************ Wコマンド .CMT SAVE ********************************
 MONSAVE:INC		HL
@@ -639,11 +711,7 @@ ERR5:	CP		0F4H
 		JR		NZ,ERR6
 		LD		HL,MSG_CMD       ;COMMAND FAILED
 		JR		ERRMSG
-ERR6:	CP		0F5H
-		JR		NZ,ERR7
-		LD		HL,MSG_F5        ;NO BASIC PROGRAM
-		JR		ERRMSG
-ERR7:	CP		0F6H
+ERR6:	CP		0F6H
 		JR		NZ,ERR99
 		LD		HL,MSG_FNAME     ;PARAMETER FAILED
 		JR		ERRMSG
@@ -664,7 +732,7 @@ CMDLOAD:
 		DEC		HL
 		LD		A,73H            ;コマンド73Hを送信
 		CALL	STCMD
-		JR		NZ,CMDLD8
+		JP		NZ,RETBC
 
 		LD		HL,0118H         ;1文字目、24行目へカーソルを移動
 		CALL	CSR
@@ -675,9 +743,8 @@ CMDLOAD:
 		JR		Z,CMDLD
 		LD		HL,MSG_F6        ;NOT BASIC PROGRAM
 		CALL	MSGOUT
-		CALL	MONCLF
 		CALL	DISPBL
-		JR		CMDLD8
+		JP		RETBC
 		
 CMDLD:	
 		LD		HL,FILNAM        ;CMTファイル中に記載のファイルネーム6文字を受信
@@ -717,10 +784,7 @@ CMDLD5:	DEC		B
 CMDLD6:	LD		BC,0007H         ;HLの位置を7つ戻してBASICプログラム終了位置とする
 		SBC		HL,BC
 		
-;		JP		AFTLOAD          ;BASICプログラムLOAD後処理
-CMDLD8:
-		JR		RETBC2
-;		RET
+		JR		RETBC2           ;BASICプログラムLOAD後処理
 		
 ;********************** BASIC CMT SAVE **********************
 CMDSAVE:
@@ -730,15 +794,12 @@ CMDSAVE:
 		INC		HL
 		OR		(HL)
 		POP		HL
-		LD		A,0F5H           ;BASICプログラムが1行もなければエラー
-		JR		Z,CMDKL3
-;		JP		Z,SDERR
+		JP		Z,CMDSV5         ;BASICプログラムが1行もなければエラー
 
 		DEC		HL
 		LD		A,74H            ;コマンド74Hを送信
 		CALL	STCMD
 		JR		NZ,CMDSV4
-;		JR		NZ,CMDSV3
 
 		LD		HL,MSG_WR        ;WRITING表示
 		CALL	MSGOUT
@@ -769,8 +830,14 @@ CMDSV2:	INC		HL
 CMDSV3:
 		LD		HL,MSG_OK        ;OK表示
 		CALL	MSGOUT
+;2022.8.4  SYNTAX ERROR回避
 CMDSV4:	JR		RETBC
-;		RET
+
+;2022.8.4  SYNTAX ERROR回避
+CMDSV5:
+		CALL	DISPBL
+		LD		HL,MSG_F5        ;NO BASIC PROGRAM
+		JR		RETBC3
 
 ;************ BASIC FILES ********************
 CMDFILES:
@@ -787,46 +854,37 @@ CMDFILES:
 		CALL	DIRLIST          ;DIRLIST本体をコール
 ;2022.8.4  SYNTAX ERROR回避
 		JR		RETBC
-;2022.7.24 SYNTAX ERROR回避
-;		LD		HL,FMSG         ;SYNTAX ERROR回避
-;		CALL	MSGOUT
-;		POP		HL
-;		RET
 		
 ;************ BASIC KILL ***************************
 CMDKILL:
+		DEC		HL
 		LD		A,75H            ;コマンド75Hを送信
 		CALL	STCMD
 		JR		NZ,RETBC         ;ファイル名が送信できなかった。
-;		JR		NZ,CMDKL4        ;ファイル名が送信できなかった。
 		CALL	RCVBYTE
 		AND		A
-		JR		NZ,CMDKL3        ;ファイルが存在しない
+		JP		NZ,CMDKL1         ;ファイルが存在しない
 		LD		HL,MSG_KL
-		CALL	MSGOUT
-		CALL	DISPBL
-		JR		RETBC
-;		JR		CMDKL4
-CMDKL3:	CALL	SDERR
-
-;CMDKL4:
-;		RET
+RETBC3:	CALL	MSGOUT
+		CALL	MONCLF
 
 ;2022.8.4 SYNTAX ERROR回避 
 ;FILES SAVE KILLからBASICへ正しい戻り方が判らなかったため、LOAD後処理で戻ることとする。
 RETBC:
 		LD		HL,(VARBGN)
-;		DEC		HL
 ;LOAD後処理
 RETBC2:
 		JP		AFTLOAD          ;BASICプログラムLOAD後処理
 		
-;FMSG	DEFB	'FILE SEARCH:'
-;FMSG:	DEFB	00H
+;2022.8.4  SYNTAX ERROR回避
+CMDKL1:
+		CALL	DISPBL
+		LD		HL,MSG_F1        ;NOT FIND FILE
+		JR		RETBC3
 
 MSG_LD:
 		DB		'LOADING '
-		DB		00H
+DEFCR:	DB		00H
 
 MSG_OK:
 		DB		'OK!'
@@ -838,7 +896,7 @@ MSG_WR:
 
 MSG_KL:
 		DB		'FILE DELETED!'
-		DB		0DH,0AH,00H
+		DB		00H
 
 MSG_AD1:
 		DB		'ADRS +0 +1 +2 +3 +4 +5 +6 +7 01234567'
@@ -892,7 +950,7 @@ MSG_F5:
 		
 MSG_F6:
 		DB		'NOT BASIC PROGRAM'
-		DB		00H
+		DB		0DH,0AH,00H
 		
 MSG99:
 		DB		' ERROR'
