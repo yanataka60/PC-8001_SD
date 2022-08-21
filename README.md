@@ -296,33 +296,15 @@ Sの後ろ、アドレス、データの区切りに空白が有っても無く�
 ### ファンクションキーを利用したオートラン機能
 ファンクションキーを利用したオートラン機能に対応していますが、一部オリジナルと異なる点があります。
 
-正常に機能させるにはbugfire2009さんの「DumpListEditor」を使って適切に修正したオートラン機能ファイルを作成してください。
+そこでオートラン機能ファイルをロードする時にPC-8001_SDの仕様に自動変換する機能を付けました。(2022.8.21実装)
 
-異なる点
+以下の修正点についてオートラン機能ファイルをロードする時に自動的に修正ロードされます。当然、修正してあっても機能します。
 
-　1　CTRL+BではMONITORからBASICへ復帰できません。CTRL+C又はB[CR]に置き換える必要があります。
+自動で修正される点
 
-　2　SD-CARDからのBASICプログラムをLOADするコマンドは「LOAD」でファイル名を指定する必要がありませんので「CLOAD"ファイル名"」を「LOAD""」とする必要があります。
+　1　CTRL+BではMONITORからBASICへ復帰できません。CTRL+Cに修正されます。
 
-例)サウンド付きRally-xの場合
-
-![AutoRun1](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/autorun(1).JPG)
-
-　CTRL+BをCTRL+Cに修正
-
-![AutoRun2](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/autorun(2).JPG)
-
-
-例)DeepScanの場合
-
-![AutoRun3](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/autorun(3).JPG)
-
-　BASICプログラム中のClear文を確認して値を設定、CTRL+BをCTRL+Cに、CLOAD"DS"をLOAD""に修正
-
-![AutoRun4](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/autorun(4).JPG)
-
-![AutoRun5](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/autorun(5).JPG)
-
+　2　SD-CARDからのBASICプログラムをLOADするコマンドは「LOAD」で、1本のCMTファイルとなっていればファイル名を指定する必要もありませんので「CLOAD"ファイル名"」は「LOAD""」に修正されます。
 
 ## 操作上の注意
 　「SD-CARD INITIALIZE ERROR」と表示されたときは、SD-CARDが挿入されているか確認し、PC-8001本体をリセットしてください。Arduinoのみのリセットでは復旧しません。
@@ -354,7 +336,7 @@ Sの後ろ、アドレス、データの区切りに空白が有っても無く�
 
 ## DumpListEditor動画作成機で作られたCMTファイルへの対応
 
-　DumpListEditor動画作成機で作られたCMTファイルも基本的に「ファンクションキーを利用したオートラン機能」への修正点と同じですが、「Chain(cmt出力時のみ)」をチェックして作られたプログラムはCMTルーチンをコールするようですので修正が必要となります。
+　DumpListEditor動画作成機で作られたCMTファイルのうち、「Chain(cmt出力時のみ)」をチェックして作られたプログラムはCMTルーチンをコールしますので修正が必要となります。
 
 セミグラ作成機＆動画作成機
 
@@ -375,9 +357,7 @@ https://bugfire2009.ojaru.jp/semigra/
 
 　2　「BASIC入力」タブをクリックして言語「Patch File」を選択する。
 
-　3　表示されているPathc File Sampleをすべて削除し、次の3行に入れ替える。
-
-/02,43,4C,45/=03,43,4C,45
+　3　表示されているPathc File Sampleをすべて削除し、次の2行に入れ替える。
 
 /CD,3A,5F,30/=CD,09,60,18
 
@@ -466,3 +446,7 @@ https://bugfire2009.ojaru.jp/semigra/
 2022.8.18
 
 　DumpListEditorの動画作成機機能で作成されたきらびぃさん作成の「メガCD版シルフィードのデモをPC8001で再生してみたフル版(修正版)」、「PC8001でBad Apple全編をcmt化」の修正方法を追加しました。
+
+2022.8.21
+
+　　MONITOR Lコマンドで読み込み時にオートラン機能ファイルであればCTRL+B、CLOADをSD用に書き換えるようにした

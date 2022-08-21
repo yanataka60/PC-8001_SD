@@ -6,6 +6,7 @@
 ;            拡張ROM認識コードを041H,042H,00Hとした。
 ;            SHIFTキーを押しながら起動することで拡張ROMを有効にするか選択できるようにした。(mk2用)
 ;            mk2においてもfiles、save、killコマンドでSyntaxErrorが出ないように修正
+;2022.8.21 MONITOR Lコマンドで読み込み時にファンクションキーエリアであればCTRL+B、CLOADをSD用に書き換えるようにした
 
 CONOUT		EQU		0257H		;CRTへの1バイト出力
 DISPBL		EQU		0350H		;ベルコードの出力
@@ -42,7 +43,9 @@ TBFILES		EQU		0F14EH		;FILESコマンドジャンプアドレス
 MONHL		EQU		0FF34H
 MONSP		EQU		0FF36H
 SADRS		EQU		0FF3DH
-EADRS		EQU		0FF41H
+EADRS		EQU		0FF3FH
+ACFLGD		EQU		0FF40H      ;オートラン機能ダブルコーテーション検出フラグ
+ACFLGC		EQU		0FF41H      ;オートラン機能CLOAD検出フラグ
 LBUF		EQU		0FF66H
 
 ;PC-8001
@@ -498,6 +501,13 @@ MONLOAD:LD		A,71H            ;Lコマンド71Hを送信
 		JP		NZ,CMD1
 
 		PUSH	HL
+; *********** オートラン書き換え用フラグクリア *** 2022.8.21 ********
+		XOR		A
+		LD		HL,ACFLGD
+		LD		(HL),A
+		INC		HL
+		LD		(HL),A
+; ********************************************************
 		LD		HL,0118H         ;1文字目、24行目へカーソルを移動
 		CALL	CSR
 		CALL	MONCLF
@@ -529,7 +539,10 @@ MCLD1:	CALL	RCVBYTE          ;ヘッダー3AH受信、廃棄
 		JR		Z,MCLD3          ;データ長が0なら終了
 		LD		B,A
 MCLD2:	CALL	RCVBYTE          ;実データ受信
-		LD		(HL),A
+; ************* オートラン機能の読み替えを追加 ****** 2022.8.21 ************
+;		LD		(HL),A
+		CALL	AUTOCHK
+;****************************************************************
 		INC		HL
 		DJNZ	MCLD2
 		CALL	RCVBYTE          ;チェックサム廃棄
@@ -538,6 +551,134 @@ MCLD3:	CALL	RCVBYTE          ;チェックサム廃棄
 		LD		HL,MSG_OK        ;OK表示
 		CALL	MSGOUT
 		JP		CMD1
+
+; ************ ファンクションキーエリアへの書込みなら書き換え ** 2022.8.21 **
+; HL : 書き込みアドレス
+; A  : 書き込みデータ
+; CTRL+B -> CTRL+C
+; CLOAD  -> LOAD
+; "xxxx" -> ""
+AUTOCHK:PUSH	DE
+		PUSH	BC
+		EX		DE,HL
+		LD		HL,1540H         ;-(EAC0H)
+		ADD		HL,DE
+		JP		NC,ACRET         ;EAC0H未満なら通常書込み
+		LD		HL,14E4H         ;-(EB1BH+1)
+		ADD		HL,DE
+		JP		C,ACRET          ;EB1CH以上なら通常書込み
+		CP		02H
+		JR		NZ,ACHK1         ;CTRL+B -> CTRL+C
+		LD		A,03H
+		JP		ACRET            ;CRTL+Cに書き換えてリターン
+		
+ACHK1:	LD		B,A
+		LD		HL,ACFLGD        ;ダブルコーテーションフラグをCHK
+		LD		A,(HL)
+		AND		A
+		JR		Z,ACHK11         ;フラグOFFなら次のCHKへ
+		LD		A,B
+		CP		'"'              ;フラグONならダブルコーテーションかCHK
+		JR		NZ,ACHK10        ;ダブルコーテーションではないなら書き込まずにリターン
+		XOR		A                ;ダブルコーテーションならフラグをリセット
+		LD		(HL),A
+		JR		ACHK40           ;ダブルコーテーションを書き込んでリターン
+
+ACHK10:	EX		DE,HL
+		DEC		HL               ;フラグONでダブルコーテーションでないなら書き込まない。書き込みアドレスもINCしないでリターン
+		JP		ACRET2
+
+ACHK11:	LD		A,B
+		CP		'"'              ;フラグOFFならダブルコーテーションかCHK
+		JR		NZ,ACHK20        ;ダブルコーテーションでないなら次のCHKへ
+		LD		A,01H            ;ダブルコーテーションならフラグON
+		LD		(HL),A
+		XOR		A
+		INC		HL
+		LD		(HL),A           ;CLOADフラグをリセット
+		JR		ACHK40           ;ダブルコーテーションを書き込んでリターン
+
+ACHK20:	LD		HL,ACFLGC        ;CLOADフラグをCHK
+		LD		A,(HL)
+		CP		00H              ;一致無し
+		JR		Z,ACHK30
+		CP		01H              ;'C'まで一致
+		JR		Z,ACHK31
+		CP		02H              ;'L'まで一致
+		JR		Z,ACHK32
+		CP		03H              ;'0'まで一致
+		JR		Z,ACHK33
+		LD		A,B              ;'A'まで一致
+		CP		'D'
+		JR		Z,ACHK39
+		CP		'd'
+		JR		NZ,ACHK40
+ACHK39:	XOR		A                ;'CLOAD'が一致
+		LD		(HL),A           ;CLOADフラグをリセット
+		EX		DE,HL            ;書き込みポインタを4つ戻して'LOAD'に上書き
+		DEC		HL
+		DEC		HL
+		DEC		HL
+		DEC		HL
+		LD		A,'L'
+		LD		(HL),A
+		INC		HL
+		LD		A,'O'
+		LD		(HL),A
+		INC		HL
+		LD		A,'A'
+		LD		(HL),A
+		INC		HL
+		LD		A,'D'
+		LD		(HL),A
+		JR		ACRET2
+
+ACHK30:	LD		A,B
+		CP		'C'
+		JR		Z,ACHK301
+		CP		'c'
+		JR		NZ,ACHK41
+ACHK301:LD		A,01H            ;'C'が一致
+		LD		(HL),A
+		JR		ACHK40
+
+ACHK31:	LD		A,B
+		CP		'L'
+		JR		Z,ACHK311
+		CP		'l'
+		JR		NZ,ACHK41
+ACHK311:LD		A,02H            ;'L'が一致
+		LD		(HL),A
+		JR		ACHK40
+
+ACHK32:	LD		A,B
+		CP		'O'
+		JR		Z,ACHK321
+		CP		'o'
+		JR		NZ,ACHK41
+ACHK321:LD		A,03H            ;'O'が一致
+		LD		(HL),A
+		JR		ACHK40
+
+ACHK33:	LD		A,B
+		CP		'A'
+		JR		Z,ACHK331
+		CP		'a'
+		JR		NZ,ACHK41
+ACHK331:LD		A,04H            ;'A'が一致
+		LD		(HL),A
+		
+ACHK40:	LD		A,B
+
+ACRET:	EX		DE,HL
+		LD		(HL),A           ;取り敢えず書き込み
+ACRET2:	POP		BC
+		POP		DE
+		RET
+
+ACHK41:	XOR		A                ;'CLOAD'と一致しなかったのでフラグをリセットして書き込み
+		LD		(HL),A
+		JR		ACHK40
 
 ;********** 5F9EH READ ONE BYTE FROM CMTの代替 *********
 D_5F9E:	LD		A,72H            ;コマンド72Hを送信
