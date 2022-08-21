@@ -449,4 +449,4 @@ https://bugfire2009.ojaru.jp/semigra/
 
 2022.8.21
 
-　　MONITOR Lコマンドで読み込み時にオートラン機能ファイルであればCTRL+B、CLOADをSD用に書き換えるようにした
+　MONITOR Lコマンドで読み込み時にオートラン機能ファイルであればCTRL+B、CLOADをSD用に書き換えるようにした
