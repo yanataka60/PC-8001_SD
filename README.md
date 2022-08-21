@@ -10,6 +10,8 @@
 
 　なお、Arduino、ROMへ書き込むための機器が別途必要となります。
 
+#### 注)N-BASIC Ver1.1で動作確認を行っていますが、N-BASIC Ver1.0では動作しないとの報告を頂きました。
+
 ## 回路図
 　KiCadフォルダ内のPC-8001_SD.pdfを参照してください。
 
@@ -86,6 +88,8 @@
 ### カードエッジコネクタによる接続
 ![Card Edge Connector1](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/PC-8001_SD(2).JPG)
 ![Card Edge Connector2](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/PC-8001_SD(4).JPG)
+
+#### 私の入手したカードエッジコネクタでは基板と本体の間が充分に離れていますが、カードエッジコネクタによっては接触の危険があるかもしれません。気になる方はカプトンテープなどで裏面を保護してください。
 
 ## SD-CARD
 　FAT16又はFAT32が認識できます。
@@ -449,4 +453,8 @@ https://bugfire2009.ojaru.jp/semigra/
 
 2022.8.21
 
-　MONITOR Lコマンドで読み込み時にオートラン機能ファイルであればCTRL+B、CLOADをSD用に書き換えるようにした
+　MONITOR Lコマンドで読み込み時にオートラン機能ファイルであればCTRL+B、CLOADをSD用に書き換えるようにした。
+
+2022.8.22
+
+　N-BASIC Ver1.0では動作しない旨を追記、カードエッジコネクタでの接続時に裏面の保護について追記。
