@@ -25,7 +25,9 @@
 |番号|品名|数量|備考|
 | ------------ | ------------ | ------------ | ------------ |
 |J1|2x25Pinコネクタ|1|秋月電子通商 PH-2x40RGなど(注1)|
-|J2|Micro_SD_Card_Kit|1|秋月電子通商 AE-microSD-LLCNV (注2)(注4)|
+||J2、J4のいずれか|||
+|J2|Micro_SD_Card_Kit|1|秋月電子通商 AE-microSD-LLCNV (注2)|
+|J4|MicroSD Card Adapter|1|Arduino等に使われる5V電源に対応したもの|
 |J3|50Pカードエッジコネクタ|1|せんごくネット通販 HRS CR22A-50D-2.54DSなど(注1)|
 |U1|74LS04|1||
 |U2 U3|74LS30|2||
@@ -35,6 +37,7 @@
 |C1-C5|積層セラミックコンデンサ 0.1uF|5||
 |C6|電解コンデンサ 16v100uF|1||
 |S1|3Pスライドスイッチ|1|秋月電子通商 SS12D01G4など|
+|S2|２回路２接点 スライドスイッチ|1|秋月電子通商 IS-2235-Gなど|
 
 　　　注1)J1又はJ3のどちらかを選択して取り付けてください。
 
@@ -42,7 +45,24 @@
 
 　　　注3)Arduino Pro MiniはA4、A5ピンも使っています。
 
-　　　注4)Arduino等に使われる5V電源に対応したMicroSD Card Adapterも正しく信号を繋げば使えます。変換基板等繋ぎ方は適宜対応してください。
+### MicroSD Card Adapterを使う(Rev1.2)
+J4に取り付けます。
+
+MicroSD Card Adapterについているピンヘッダを除去してハンダ付けするのが一番確実ですが、J4の穴にMicroSD Card Adapterをぴったりと押しつけ、裏から多めにハンダを流し込むことでハンダ付けをする方法もあります。なお、この方法の時にはしっかりハンダ付けが出来たかテスターで導通を確認しておいた方が安心です。
+
+ハンダ付けに自信のない方はJ2の秋月電子通商　AE-microSD-LLCNVをお使いください。AE-microSD-LLCNVならパワーLED、アクセスLEDが付いています。
+
+![MicroSD Card Adapter1](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/MicroSD%20Card%20Adapter(1).JPG)
+
+![MicroSD Card Adapter2](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/MicroSD%20Card%20Adapter(2).JPG)
+
+![MicroSD Card Adapter3](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/MicroSD%20Card%20Adapter(3).JPG)
+
+![MicroSD Card Adapter4](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/MicroSD%20Card%20Adapter(4).JPG)
+
+
+### MicroSD Card Adapterを使う(Rev1.1)
+以下のピン番号を参考に変換基板等繋ぎ方は適宜対応してください。
 
 |AE-microSD-LLCNVピン番号|MicroSD Card Adapterピン番号|信号名|
 | ---------------------- | -------------------------- | ---- |
@@ -387,7 +407,16 @@ https://bugfire2009.ojaru.jp/semigra/
 
 　終わったら『2　「BASIC入力」タブをクリックして言語「Patch File」を選択する。』以降を行ってください。
 
-## RAMボートとの共存について
+## RAMボートとの共存について(Rev1.2)
+　S2のROMDS3を「EXT」にすることでポートE2hを制御して$0000～$7FFFの空間をROM→RAM切替するボードと共存します。
+
+![RIMDS3_SWITCH](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/RIMDS3_SWITCH.JPG)
+
+　S1のSD→CMT切替は機能しなくなりますが、どちらかにしておいてください。
+
+　PC-8001_SDを繋いだままPC-8001_SDのROMを無効にしたい場合はS2のROMDS3を「FIX」、S1のSD→CMT切替を「CMT」にしてください。
+
+## RAMボートとの共存について(Rev1.1)
 　ポートE2hを制御して$0000～$7FFFの空間をROM→RAM切替するボードと共存するにはパターンカットとジャンパ線の追加による改造が必要となります。
 
 　本体内拡張ROM用ICソケットに挿入されたROMとの共存を考慮した設計だったのですが、RAMボードとの共存には裏目に出てしまいました。
