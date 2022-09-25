@@ -820,7 +820,7 @@ U 1 1 6188B7C4
 P 13950 2200
 F 0 "J2" H 13450 2900 50  0000 L CNN
 F 1 "Micro_SD_Card_Kit" H 13950 2900 50  0000 L CNN
-F 2 "MZ80k_SD:AE-microSD-LLCNV" H 15100 2500 50  0001 C CNN
+F 2 "Kicad:AE-microSD-LLCNV" H 15100 2500 50  0001 C CNN
 F 3 "http://katalog.we-online.de/em/datasheet/693072010801.pdf" H 13950 2200 50  0001 C CNN
 	1    13950 2200
 	1    0    0    -1  
@@ -1003,7 +1003,7 @@ U 1 1 61A254A8
 P 12300 4800
 F 0 "U6" H 12300 5689 60  0000 C CNN
 F 1 "Arduino_Pro_Mini_5V" H 12300 5583 60  0000 C CNN
-F 2 "MZ80k_SD:Arduino_Pro_Mini" H 13100 4050 60  0001 C CNN
+F 2 "Kicad:Arduino_Pro_Mini" H 13100 4050 60  0001 C CNN
 F 3 "https://www.sparkfun.com/products/11113" H 12500 3600 60  0001 C CNN
 	1    12300 4800
 	1    0    0    -1  
@@ -1309,4 +1309,47 @@ Wire Wire Line
 	5550 4550 5550 4700
 Wire Wire Line
 	4700 4550 3650 4550
+$Comp
+L Connector_Generic:Conn_01x06 J4
+U 1 1 631763B9
+P 14900 3500
+F 0 "J4" H 14550 3050 50  0000 L CNN
+F 1 "MicroSD Card Adapter" H 14300 2950 50  0000 L CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_1x06_P2.54mm_Vertical" H 14900 3500 50  0001 C CNN
+F 3 "~" H 14900 3500 50  0001 C CNN
+	1    14900 3500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	14700 3300 14450 3300
+Wire Wire Line
+	14700 3400 14450 3400
+Wire Wire Line
+	14700 3500 14450 3500
+Wire Wire Line
+	14700 3600 14450 3600
+Wire Wire Line
+	14700 3700 14450 3700
+Wire Wire Line
+	14700 3800 14450 3800
+Text Label 14450 3300 0    50   ~ 0
+GND
+Text Label 14450 3400 0    50   ~ 0
++5V
+Text Label 14450 3500 0    50   ~ 0
+MISO
+Text Label 14450 3600 0    50   ~ 0
+MOSI
+Text Label 14450 3700 0    50   ~ 0
+SCK
+Text Label 14450 3800 0    50   ~ 0
+CS
+Text Label 12450 2300 0    50   ~ 0
+SCK
+Text Label 12550 2400 0    50   ~ 0
+MISO
+Text Label 12650 2500 0    50   ~ 0
+MOSI
+Text Label 12750 2600 0    50   ~ 0
+CS
 $EndSCHEMATC
