@@ -28,8 +28,8 @@
 |J1|2x25Pinコネクタ|1|秋月電子通商 PH-2x40RGなど(注1)|
 |J3|50Pカードエッジコネクタ|1|せんごくネット通販 HRS CR22A-50D-2.54DSなど(注1)|
 ||J2、J4のいずれか|||
-|J2|Micro_SD_Card_Kit|1|秋月電子通商 AE-microSD-LLCNV (注2)|
-|J4|MicroSD Card Adapter|1|Arduino等に使われる5V電源に対応したもの|
+|J2|Micro_SD_Card_Kit|1|秋月電子通商 AE-microSD-LLCNV (注2) (注4)|
+|J4|MicroSD Card Adapter|1|Arduino等に使われる5V電源に対応したもの (注4)|
 |U1|74LS04|1||
 |U2 U3|74LS30|2||
 |U4|8255|1||
@@ -45,6 +45,8 @@
 　　　注2)秋月電子通商　AE-microSD-LLCNVのJ1ジャンパはショートしてください。
 
 　　　注3)Arduino Pro MiniはA4、A5ピンも使っています。
+
+　　　注4)J2又はJ4のどちらかを選択して取り付けてください。
 
 ### MicroSD Card Adapterを使う(Rev1.2)
 J4に取り付けます。
