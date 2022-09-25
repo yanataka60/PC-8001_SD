@@ -534,3 +534,7 @@ https://bugfire2009.ojaru.jp/semigra/
 2022.9.18
 
 　PSA基板に増設する拡張メモリー基板とは共存できないことを追記
+
+2022.9.25
+
+　MicroSD Card Adapter用の端子、ROMDS3制御切り替えスイッチを付加し、基板をRev1.2に更新。
