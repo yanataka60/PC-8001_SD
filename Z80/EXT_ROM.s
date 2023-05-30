@@ -544,8 +544,7 @@ MCNLOAD:LD		HL,MSG_LD        ;LOADING表示
 		CALL	MSGOUT
 
 ; *********** LOAD中専用のスタックポインタとすることでCLEAR文でSPを変更していなくてもE800H以降に正常にLOAD出来るよう対処 2023.5.30 ********
-		LD		(0FFFFH),SP
-		LD		SP,0FFFEH
+		LD		SP,0FFFFH
 
 		LD		HL,SADRS+1       ;SADRS取得
 		CALL	RCVBYTE
