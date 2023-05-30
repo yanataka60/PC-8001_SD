@@ -7,6 +7,8 @@
 ;            SHIFTキーを押しながら起動することで拡張ROMを有効にするか選択できるようにした。(mk2用)
 ;            mk2においてもfiles、save、killコマンドでSyntaxErrorが出ないように修正
 ;2022.8.21 MONITOR Lコマンドで読み込み時にファンクションキーエリアであればCTRL+B、CLOADをSD用に書き換えるようにした
+;2023.5.30 MONHOTの扱い方を修正、MONERRを移動
+;          LOAD中専用のスタックポインタとすることでCLEAR文でSPを変更していなくてもE800H以降に正常にLOAD出来るよう対処
 
 CONOUT		EQU		0257H		;CRTへの1バイト出力
 DISPBL		EQU		0350H		;ベルコードの出力
@@ -213,7 +215,7 @@ MONINI:	LD		(MONHL),HL
 ;		CALL	MSGOUT
 ;		POP		HL
 		
-CMD0:	LD		BC,MONERR         ;BASICに戻るときPOPしているのでお約束らしい
+CMD0:	LD		BC,MONERR         ;パラメータエラーをRET Cで戻りる先をセット
 		PUSH	BC
 CMD1:
 		LD		A,'*'
@@ -249,17 +251,24 @@ CMD2:
 		
 ;MONMSG:	DEFB	0CH,'**PC-8001_SD Monitor **',0DH,0AH,00H
 
+;************************* MONHOTの扱い方を修正、MONERRを移動 2023.5.30 ****************************
+;パラメータエラー処理
+MONERR:	LD		A,0F6H
+		CALL	SDERR
+;************************* MONHOTの扱い方を修正 2023.5.30 ****************************
+;		JP		CMD1
+
 ;*********** MONITOR HOT START  (EMI PLAYER用)  *******************************
 ;5C66H代替ルーチン
 MONHOT:
-		LD		SP,(MONSP)
+		LD		SP,(MONSP)        ;スタックポインタを復帰
 		CALL	MONCLF
 		JR		CMD0
 
 ;************ Bコマンド BASIC復帰 ***********************
 MONCTB:
 ;***** 2022.8.10 BUG修正 ***********
-		POP		BC
+		POP		BC                ;パラメータエラー戻り先を破棄
 ;***********************************
 		LD		HL,(MONHL)
 		EI
@@ -269,21 +278,18 @@ MONCTB:
 GOCMD:	INC		HL
 		CALL	STFN
 		CALL	HLHEX             ;4桁の16進数であればHLにセットして続行
-		JP		C,MONERR
+		RET		C
+;		JP		C,MONERR
 		CALL	MONCLF
 		POP		BC
 		JP		(HL)              ;HLの示すアドレスにジャンプ
-
-;パラメータエラー処理
-MONERR:	LD		A,0F6H
-		CALL	SDERR
-		JP		CMD1
 
 ;************ Dコマンド アドレスxxxxからのMEMORYをDUMP **********************
 STMD:	INC		HL
 		CALL	STFN
 		CALL	HLHEX             ;4桁の16進数であればSADRSにセットして続行
-		JP		C,MONERR
+		RET		C
+;		JP		C,MONERR
 		LD		(SADRS),HL        ;SARDS保存
 
 STMD6:	LD		HL,MSG_AD1        ;DUMP TITLE表示
@@ -339,13 +345,17 @@ STMD3:	CALL	KYSCAN            ;1文字入力待ち
 		SBC		HL,DE
 		LD		(SADRS),HL
 STMD5:	JP		STMD6
-STMD4:	JP		CMD1
+STMD4:
+;************************* MONHOTの扱い方を修正 2023.5.30 ****************************
+		JP		MONHOT
+;		JP		CMD1
 
 ;************ Sコマンド アドレスxxxxからMEMORYに書き込み **********************
 STMW:	INC		HL
 		CALL	STFN
 		CALL	HLHEX             ;4桁の16進数であればHLにセットして続行
-		JP		C,MONERR
+		RET		C
+;		JP		C,MONERR
 
 STSP1:	LD		A,(DE)
 		AND		A
@@ -382,7 +392,10 @@ STMW8:	PUSH	HL
 		INC		HL
 		EX		DE,HL
 		JR		STSP1
-STMW9:	JP		CMD1
+STMW9:
+;************************* MONHOTの扱い方を修正 2023.5.30 ****************************
+		JP		MONHOT
+;		JP		CMD1
 
 ;************ Fコマンド DIRLIST **********************
 STLT:	INC		HL
@@ -393,7 +406,9 @@ STLT:	INC		HL
 		CALL	DIRLIST           ;DIRLIST本体をコール
 		AND		A                 ;00以外ならERROR
 		CALL	NZ,SDERR
-		JP		CMD1
+;************************* MONHOTの扱い方を修正 2023.5.30 ****************************
+		JP		MONHOT
+;		JP		CMD1
 
 
 ;**** DIRLIST本体 (HL=行頭に付加する文字列の先頭アドレス BC=行頭に付加する文字列の長さ) ****
@@ -498,7 +513,9 @@ DLRET:	RET
 ;************ Lコマンド .CMT LOAD *************************
 MONLOAD:LD		A,71H            ;Lコマンド71Hを送信
 		CALL	STCMD
-		JP		NZ,CMD1
+;************************* MONHOTの扱い方を修正 2023.5.30 ****************************
+		JP		NZ,MONHOT
+;		JP		NZ,CMD1
 
 		PUSH	HL
 ; *********** オートラン書き換え用フラグクリア *** 2022.8.21 ********
@@ -519,10 +536,16 @@ MONLOAD:LD		A,71H            ;Lコマンド71Hを送信
 		CALL	MSGOUT
 		CALL	MONCLF
 		CALL	DISPBL
-		JP		CMD1
+;************************* MONHOTの扱い方を修正 2023.5.30 ****************************
+		JP		MONHOT
+;		JP		CMD1
 		
 MCNLOAD:LD		HL,MSG_LD        ;LOADING表示
 		CALL	MSGOUT
+
+; *********** LOAD中専用のスタックポインタとすることでCLEAR文でSPを変更していなくてもE800H以降に正常にLOAD出来るよう対処 2023.5.30 ********
+		LD		(0FFFFH),SP
+		LD		SP,0FFFEH
 
 		LD		HL,SADRS+1       ;SADRS取得
 		CALL	RCVBYTE
@@ -550,7 +573,9 @@ MCLD2:	CALL	RCVBYTE          ;実データ受信
 MCLD3:	CALL	RCVBYTE          ;チェックサム廃棄
 		LD		HL,MSG_OK        ;OK表示
 		CALL	MSGOUT
-		JP		CMD1
+;************************* MONHOTの扱い方を修正 2023.5.30 ****************************
+		JP		MONHOT           ;SPを復帰してコマンド待ちへ
+;		JP		CMD1
 
 ; ************ ファンクションキーエリアへの書込みなら書き換え ** 2022.8.21 **
 ; HL : 書き込みアドレス
@@ -714,13 +739,15 @@ D_5F3A:
 MONSAVE:INC		HL
 		CALL	STFN
 		CALL	HLHEX            ;4桁の16進数であればSADRSにセットして続行
-		JP		C,MONERR
+		RET		C
+;		JP		C,MONERR
 		LD		(SADRS),HL       ;SARDS保存
 		EX		DE,HL
 
 		CALL	STFN
 		CALL	HLHEX            ;4桁の16進数であればEADRSにセットして続行
-		JP		C,MONERR
+		RET		C
+;		JP		C,MONERR
 		LD		(EADRS),HL       ;EARDS保存
 
 		PUSH	DE
@@ -729,14 +756,17 @@ MONSAVE:INC		HL
 		SBC		HL,DE
 		POP		HL
 		POP		DE
-		JP		C,MONERR         ;EADRSがSADRSより小さければエラー
+		RET		C
+;		JP		C,MONERR         ;EADRSがSADRSより小さければエラー
 
 		EX		DE,HL
 		DEC		HL
 		
 		LD		A,70H            ;コマンド70Hを送信
 		CALL	STCMD
-		JP		NZ,CMD1
+;************************* MONHOTの扱い方を修正 2023.5.30 ****************************
+		JP		NZ,MONHOT
+;		JP		NZ,CMD1
 
 		LD		HL,MSG_WR        ;WRITING表示
 		CALL	MSGOUT
@@ -763,7 +793,9 @@ MONSV2:	INC		HL
 		JR		MONSV1
 MONSV3:	LD		HL,MSG_OK        ;OK表示
 		CALL	MSGOUT
-		JP		CMD1
+;************************* MONHOTの扱い方を修正 2023.5.30 ****************************
+		JP		MONHOT
+;		JP		CMD1
 
 ;**** コマンド送信 (IN:A コマンドコード)****
 STCD:	CALL	SNDBYTE          ;Aレジスタのコマンドコードを送信
