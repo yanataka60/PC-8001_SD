@@ -1,0 +1,18 @@
+			  Z80 ASSEMBLER - ZASM VER 1.6
+                      	;************************** SD ACCESS関連サービスルーチンテスト *******************
+  52ED                	MSGOUT		EQU		52EDH		;文字列の出力2
+                      	
+  A100                				ORG		0A100H
+                      			
+  A100  210BA1        				LD		HL,MSG
+  A103  CDED52        				CALL	MSGOUT
+  A106  F1            				POP		AF
+  A107  C1            				POP		BC
+  A108  D1            				POP		DE
+  A109  E1            				POP		HL
+                      				
+  A10A  C9            				RET
+                      	
+  A10B  0D0A5344205445	MSG:		DEFB	0DH,0AH,'SD TEST OK',0DH,0AH,00H
+  A11A                				END
+

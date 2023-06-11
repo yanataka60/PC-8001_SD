@@ -1,0 +1,66 @@
+			  Z80 ASSEMBLER - ZASM VER 1.6
+                      	;************************** SD ACCESS関連サービスルーチンテスト *******************
+  600F                	ROPEN		EQU		600FH
+  6006                	R1BYTE		EQU		6006H
+  6009                	H_5F3A		EQU		6009H
+  6012                	WAOPEN		EQU		6012H
+  601B                	WNOPEN		EQU		601BH
+  6018                	W1BYTE		EQU		6018H
+  601E                	WCLOSE		EQU		601EH
+  6015                	D_5ED9		EQU		6015H
+  5EC5                	PRHEX		EQU		5EC5H		;16進データ2桁表示
+  5FD4                	MONSPC		EQU		5FD4H		;スペースの表示
+                      	
+  A000                				ORG		0A000H
+                      	
+  A000  E5            				PUSH	HL
+  A001  D5            				PUSH	DE
+  A002  C5            				PUSH	BC
+  A003  F5            				PUSH	AF
+                      	;********* WNAMEのファイル名で新規にファイルを作成し、01H～FFHまで255Byteのデータを書き込む
+  A004  2158A0        				LD		HL,WNAME
+  A007  CD1B60        				CALL	WNOPEN
+  A00A  06FF          				LD		B,0FFH
+  A00C  3E01          				LD		A,01H
+  A00E  CD1860        	LOP1:		CALL	W1BYTE
+  A011  3C            				INC		A
+  A012  10FA          				DJNZ	LOP1
+  A014  CD1E60        				CALL	WCLOSE
+                      	
+                      	;********* WNAMEのファイル名のファイルを読み込み用として開き、255Byteのデータを読み込み、16進数として表示する。
+  A017  2158A0        				LD		HL,WNAME
+  A01A  CD0F60        				CALL	ROPEN
+  A01D  06FF          				LD		B,0FFH
+  A01F  CD0660        	LOP2:		CALL	R1BYTE
+  A022  CDC55E        				CALL	PRHEX
+  A025  CDD45F        				CALL	MONSPC
+  A028  10F5          				DJNZ	LOP2
+                      	
+                      	;********* WNAMEのファイル名でファイルを書き込み用に開き、FFH～01Hまで255Byteのデータを追加で書き込む
+  A02A  2158A0        				LD		HL,WNAME
+  A02D  CD1260        				CALL	WAOPEN
+  A030  06FF          				LD		B,0FFH
+  A032  3EFF          				LD		A,0FFH
+  A034  CD1860        	LOP3:		CALL	W1BYTE
+  A037  3D            				DEC		A
+  A038  10FA          				DJNZ	LOP3
+  A03A  CD1E60        				CALL	WCLOSE
+                      				
+                      	;********* WNAME2のファイル名で新規にファイルを作成し、A000H～A07AHまでもメモリデータを機械語フォーマットのファイルとして作成する
+  A03D  216FA0        				LD		HL,WNAME2
+  A040  CD1B60        				CALL	WNOPEN
+  A043  2100A0        				LD		HL,0A000H
+  A046  1196A0        				LD		DE,0A096H
+  A049  CD1560        				CALL	D_5ED9
+                      	
+                      	;********* WNAME2のファイル名でファイルをオープンし、機械語フォーマットのファイルとしてロードして実行
+  A04C  218AA0        				LD		HL,WNAME3
+  A04F  CD0F60        				CALL	ROPEN
+  A052  CD0960        				CALL	H_5F3A
+  A055  C300A1        				JP		0A100H
+                      	
+  A058  53445F57524954	WNAME		DB		'SD_WRITE_READ_TEST.DAT',00H
+  A06F  53445F5752545F	WNAME2		DB		'SD_WRT_DIRECT_TEST.BIN.CMT',00H
+  A08A  53445F54455354	WNAME3		DB		'SD_TEST2.BIN.CMT',00H
+  A09B                				END
+
