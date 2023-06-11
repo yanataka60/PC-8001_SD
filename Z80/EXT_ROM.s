@@ -9,6 +9,7 @@
 ;2022.8.21 MONITOR Lコマンドで読み込み時にファンクションキーエリアであればCTRL+B、CLOADをSD用に書き換えるようにした
 ;2023.5.30 MONHOTの扱い方を修正、MONERRを移動
 ;          LOAD中専用のスタックポインタとすることでCLEAR文でSPを変更していなくてもE800H以降に正常にLOAD出来るよう対処
+;2023.6.10 SDアクセスサービスルーチンを追加。5F3AH代替ルーチンを見直し。
 
 CONOUT		EQU		0257H		;CRTへの1バイト出力
 DISPBL		EQU		0350H		;ベルコードの出力
@@ -103,16 +104,66 @@ PPI_R		EQU		PPI_A+3
 
 ;*********** OPENしているファイルから1BYTE読み出し転送 ****************
 ;5F9EH代替ルーチン
+;A <- 読み出されたデータ
+;     読み込み用としてOPENしているファイルから1BYTE読み出し
 		JP		D_5F9E
 
 ;*********** CMT LOAD 直呼び出し (EMI PLAYER用) *****************************
 ;5F3AH代替ルーチン
-		JP		D_5F3A
+;     読み出しオープンされているファイルから機械語フォーマットで保存されている機械語を読み出す。
+;     正常終了 CF=0、異常終了 CF=1
+		JP		H_5F3A
 
 ;*********** MONITOR HOT START  (EMI PLAYER用) ********************
 ;5C66H代替ルーチン
 		JP		MONHOT
-		
+
+;*********** SD READ OPEN *****************************
+;HL <- DOS_FILENAME先頭アドレス
+;      HLレジスタが示すDOS_FILENAMEで読み込み用ファイルをオープン
+;      DOS_FILENAMEは32文字まで、最後に00Hをつけること。
+;      フラグレジスタ以外のレジスタは変化しない。
+;      正常終了 CF=0、異常終了 CF=1
+		JP		ROPEN
+
+;*********** SD WRITE APPEND OPEN ****************************
+;HL <- DOS_FILENAME先頭アドレス
+;      HLレジスタが示すDOS_FILENAMEで追加書き込み用としてファイルをオープン
+;      DOS_FILENAMEは32文字まで、最後に00Hをつけること。
+;      フラグレジスタ以外のレジスタは変化しない。
+;      正常終了 CF=0、異常終了 CF=1
+		JP		WAOPEN
+
+;*********** SD WRITE 直呼び出し 5ED9H代替 ***************************
+;HL <- 書き込み開始アドレス
+;DE <- 書き込み終了アドレス
+;      書込み用でオープンされているファイルに書き込み開始アドレスから
+;      書き込み終了アドレスまでのメモリ内容を機械語フォーマットで書出し、クローズする。
+;      正常終了 CF=0、異常終了 CF=1
+		JP		D_5ED9
+
+;*********** SD WRITE 1BYTE 5F2FH代替 ***************************
+;A <- 書き込みデータ
+;     書込み用でオープンされているファイルにAレジスタのデータを追加書込みする。
+;     フラグレジスタ以外のレジスタは変化しない。
+;     正常終了 CF=0、異常終了 CF=1
+		JP		D_5F2F
+
+;*********** SD WRITE NEW OPEN ****************************
+;HL <- DOS_FILENAME先頭アドレス
+;      HLレジスタが示すDOS_FILENAMEで書き込み用として新たにファイルをオープン。
+;      同名のDOS_FILENAMEのファイルがある場合は削除したのちにオープンする。
+;      DOS_FILENAMEは32文字まで、最後に00Hをつけること。
+;      フラグレジスタ以外のレジスタは変化しない。
+;      正常終了 CF=0、異常終了 CF=1
+		JP		WNOPEN
+
+;*********** SD WRITE CLOSE ****************************
+;      書込み用ファイルをクローズする。
+;      フラグレジスタ以外のレジスタは変化しない。
+;      正常終了 CF=0、異常終了 CF=1
+		JP		WCLOSE
+
 ;**** 8255初期化 ****
 ;PORTC下位BITをOUTPUT、上位BITをINPUT、PORTBをINPUT、PORTAをOUTPUT
 INIT:	LD		A,8AH
@@ -714,6 +765,126 @@ D_5F9E:	LD		A,72H            ;コマンド72Hを送信
 		CALL	RCVBYTE          ;1Byteのみ受信
 		RET
 
+;********** SD READ OPEN *******************************
+ROPEN:	PUSH	HL
+		PUSH	DE
+		PUSH	BC
+		PUSH	AF
+		LD		A,76H            ;コマンド76Hを送信
+		CALL	STCD
+		AND		A
+		JR		NZ,ERRRET
+		CALL	STFS             ;ファイルネームを送信
+
+OKRET:	XOR		A                ;正常終了 フラグをリセット後、全レジスタ復帰
+		POP		BC
+		LD		A,B
+		POP		BC
+		POP		DE
+		POP		HL
+		RET
+
+ERRRET:	POP		AF               ;異常終了 全レジスタ復帰後、CF=1
+		POP		BC
+		POP		DE
+		POP		HL
+		SCF
+		RET
+
+;********** SD WRITE APPEND OPEN *******************************
+WAOPEN:	PUSH	HL
+		PUSH	DE
+		PUSH	BC
+		PUSH	AF
+		LD		A,77H            ;コマンド77Hを送信
+		CALL	STCD
+		AND		A
+		JR		NZ,ERRRET
+		CALL	STFS             ;ファイルネームを送信
+		JR		OKRET
+
+;*********** SD WRITE 直呼び出し 5ED9H代替 ***************************
+D_5ED9:	PUSH	DE
+		LD		(SADRS),HL       ;SARDS保存
+		LD		(EADRS),DE       ;EARDS保存
+		LD		A,7AH            ;コマンド7AHを送信
+		CALL	STCD
+		AND		A
+		JR		NZ,D_5ED9V5
+
+		LD		HL,(SADRS)       ;SADRSを送信
+		LD		A,L
+		CALL	SNDBYTE
+		LD		A,H
+		CALL	SNDBYTE
+		LD		DE,(EADRS)       ;送信する全体バイト数を算出するためにEADRSを送信
+		LD		A,E
+		CALL	SNDBYTE
+		LD		A,D
+		CALL	SNDBYTE
+D_5ED9V1:
+		LD		A,(HL)           ;SADRSからEADRSまでを送信
+		CALL	SNDBYTE
+		LD		A,H
+		CP		D
+		JR		NZ,D_5ED9V2
+		LD		A,L
+		CP		E
+		JR		Z,D_5ED9V3       ;HL = DE までLOOP
+D_5ED9V2:
+		INC		HL
+		JR		D_5ED9V1
+D_5ED9V3:
+		CALL	RCVBYTE          ;状態取得(00H=OK)
+		INC		HL
+		POP		DE
+		XOR		A
+		RET
+D_5ED9V5:
+		POP		DE
+		XOR		A
+		SCF
+		RET
+;********** SD WRITE 1BYTE 5F2FH代替 *********
+D_5F2F:	PUSH	HL
+		PUSH	DE
+		PUSH	BC
+		PUSH	AF
+		LD		A,78H            ;コマンド78Hを送信
+		CALL	STCD
+		AND		A
+		JR		NZ,ERRRET
+		POP		AF
+		PUSH	AF
+		CALL	SNDBYTE          ;1Byteのみ送信
+		CALL	RCVBYTE          ;状態取得(00H=OK)
+		AND		A
+		JR		NZ,ERRRET
+		JR		OKRET
+
+;********** SD WRITE NEW OPEN *******************************
+WNOPEN:	PUSH	HL
+		PUSH	DE
+		PUSH	BC
+		PUSH	AF
+		LD		A,79H            ;コマンド79Hを送信
+		CALL	STCD
+		AND		A
+		JR		NZ,ERRRET
+		CALL	STFS             ;ファイルネームを送信
+		JP		OKRET
+
+;********** SD WRITE CLOSE *******************************
+WCLOSE:	PUSH	HL
+		PUSH	DE
+		PUSH	BC
+		PUSH	AF
+		LD		A,7BH            ;コマンド7BHを送信
+		CALL	STCD
+		AND		A
+		JP		NZ,ERRRET
+		JP		OKRET
+
 ;**** コマンド、ファイル名送信 (IN:A コマンドコード HL:ファイルネームの先頭)****
 STCMD:	INC		HL
 		CALL	STFN             ;空白除去
@@ -727,17 +898,53 @@ STCMD:	INC		HL
 		JP		NZ,SDERR
 		RET
 
+;****2023.6.10 H_5F3Aとしたことで不要となった ****************************
 ;************ 5F3AH READ FROM TAPEの代替 (EMI PLAYER用)*******************
-D_5F3A:
+;D_5F3A:
 ;************ 連続してAUTO STARTをするためにフラグポイント再設定 (正解なのかは自信なし)************
-		LD		HL,FKDEF
-		LD		(FKPINT),HL
+;		LD		HL,FKDEF
+;		LD		(FKPINT),HL
 ;**************************************************************************************
-		
+;		
 ;ファイル名指定なしとしてMONITOR Lコマンド実行 *********************
-		LD		HL,DEFCR-1
-		JP		MONLOAD
+;		LD		HL,DEFCR-1
+;		JP		MONLOAD
 
+;************ 5F3AH READ FROM TAPEの代替 (汎用)*******************
+H_5F3A:	LD		HL,DEFCR-1       ;ファイル名指定なし
+		LD		A,71H            ;Lコマンド71Hを送信
+		CALL	STCMD
+		JP		NZ,ERRRET
+
+		CALL	RCVBYTE          ;ヘッダー受信
+		CP		3AH              ;3AHであれば続行
+		JR		Z,H_5V1
+		JP		ERRRET
+		
+H_5V1:	LD		HL,SADRS+1       ;SADRS取得
+		CALL	RCVBYTE
+		LD		(HL),A
+		DEC		HL
+		CALL	RCVBYTE
+		LD		(HL),A
+		CALL	RCVBYTE          ;チェックサム廃棄
+		
+		LD		HL,(SADRS)
+H_5V2:	CALL	RCVBYTE          ;ヘッダー3AH受信、廃棄
+		CALL	RCVBYTE          ;データ長
+		AND		A
+		JR		Z,H_5V4          ;データ長が0なら終了
+		LD		B,A
+H_5V3:	CALL	RCVBYTE          ;実データ受信
+		LD		(HL),A
+		INC		HL
+		DJNZ	H_5V3
+		CALL	RCVBYTE          ;チェックサム廃棄
+		JR		H_5V2
+H_5V4:	CALL	RCVBYTE          ;チェックサム廃棄
+		RET
+H_5V5:	SCF
+		RET
 ;************ Wコマンド .CMT SAVE ********************************
 MONSAVE:INC		HL
 		CALL	STFN
