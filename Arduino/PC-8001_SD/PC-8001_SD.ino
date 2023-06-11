@@ -9,7 +9,8 @@ byte s_data[260];
 char f_name[40];
 char c_name[40];
 char new_name[40];
-File file;
+char w_name[40];
+File file,w_file;
 unsigned int s_adrs,e_adrs,w_length,w_len1,w_len2,s_adrs1,s_adrs2,b_length;
 
 #define CABLESELECTPIN  (10)
@@ -63,6 +64,8 @@ void setup(){
   digitalWrite(FLGPIN,LOW);
 
   delay(1500);
+//sd_waopen sd_wnopen sd_wdirectでSAVE用ファイル名を指定なくSAVEされた場合のデフォルトファイル名を設定
+  strcpy(w_name,"default.dat");
 
   // SD初期化
   if( !SD.begin(CABLESELECTPIN,8) )
@@ -369,6 +372,68 @@ void bas_load(void){
   }
 }
 
+
+void w_body(void){
+byte r_data,csum;
+//ヘッダー 0x3A書き込み
+  w_file.write(char(0x3A));
+//スタートアドレス取得、書き込み
+  s_adrs1 = rcv1byte();
+  s_adrs2 = rcv1byte();
+  w_file.write(s_adrs2);
+  w_file.write(s_adrs1);
+//CHECK SUM計算、書き込み
+  csum = 0 - (s_adrs1 + s_adrs2);
+  w_file.write(csum);
+//スタートアドレス算出
+  s_adrs = s_adrs1+s_adrs2*256;
+//エンドアドレス取得
+  s_adrs1 = rcv1byte();
+  s_adrs2 = rcv1byte();
+//エンドアドレス算出
+  e_adrs = s_adrs1+s_adrs2*256;
+//ファイル長算出、ブロック数算出
+  w_length = e_adrs - s_adrs + 1;
+  w_len1 = w_length / 255;
+  w_len2 = w_length % 255;
+
+//実データ受信、書き込み
+//0xFFブロック
+  while (w_len1 > 0){
+    w_file.write(char(0x3A));
+    w_file.write(char(0xFF));
+    csum = 0xff;
+    for (unsigned int lp1 = 1;lp1 <= 255;lp1++){
+      r_data = rcv1byte();
+      w_file.write(r_data);
+      csum = csum + r_data;
+    }
+//CHECK SUM計算、書き込み
+    csum = 0 - csum;
+    w_file.write(csum);
+    w_len1--;
+  }
+
+//端数ブロック処理
+  if (w_len2 > 0){
+    w_file.write(char(0x3A));
+    w_file.write(w_len2);
+    csum = w_len2;
+    for (unsigned int lp1 = 1;lp1 <= w_len2;lp1++){
+      r_data = rcv1byte();
+      w_file.write(r_data);
+      csum = csum + r_data;
+      
+    }
+//CHECK SUM計算、書き込み
+    csum = 0 - csum;
+    w_file.write(csum);
+  }
+  w_file.write(char(0x3A));
+  w_file.write(char(0x00));
+  w_file.write(char(0x00));
+}
+
 // MONITOR Wコマンド .CMT SAVE
 void cmt_save(void){
 byte r_data,csum;
@@ -378,74 +443,20 @@ byte r_data,csum;
   if (m_name[0]!=0x00){
     addcmt(m_name,f_name);
   
+  if( true == w_file ){
+    w_file.close();
+  }
 //ファイルが存在すればdelete
     if (SD.exists(f_name) == true){
       SD.remove(f_name);
     }
 //ファイルオープン
-    file = SD.open( f_name, FILE_WRITE );
-    if( true == file ){
+    w_file = SD.open( f_name, FILE_WRITE );
+    if( true == w_file ){
 //状態コード送信(OK)
       snd1byte(0x00);
-
-//ヘッダー 0x3A書き込み
-      file.write(char(0x3A));
-//スタートアドレス取得、書き込み
-      s_adrs1 = rcv1byte();
-      s_adrs2 = rcv1byte();
-      file.write(s_adrs2);
-      file.write(s_adrs1);
-//CHECK SUM計算、書き込み
-      csum = 0 - (s_adrs1 + s_adrs2);
-      file.write(csum);
-//スタートアドレス算出
-      s_adrs = s_adrs1+s_adrs2*256;
-//エンドアドレス取得
-      s_adrs1 = rcv1byte();
-      s_adrs2 = rcv1byte();
-//エンドアドレス算出
-      e_adrs = s_adrs1+s_adrs2*256;
-//ファイル長算出、ブロック数算出
-      w_length = e_adrs - s_adrs + 1;
-      w_len1 = w_length / 255;
-      w_len2 = w_length % 255;
-
-//実データ受信、書き込み
-//0xFFブロック
-      while (w_len1 > 0){
-        file.write(char(0x3A));
-        file.write(char(0xFF));
-        csum = 0xff;
-        for (unsigned int lp1 = 1;lp1 <= 255;lp1++){
-          r_data = rcv1byte();
-          file.write(r_data);
-          csum = csum + r_data;
-        }
-//CHECK SUM計算、書き込み
-        csum = 0 - csum;
-        file.write(csum);
-        w_len1--;
-      }
-
-//端数ブロック処理
-      if (w_len2 > 0){
-        file.write(char(0x3A));
-        file.write(w_len2);
-        csum = w_len2;
-        for (unsigned int lp1 = 1;lp1 <= w_len2;lp1++){
-          r_data = rcv1byte();
-          file.write(r_data);
-          csum = csum + r_data;
-          
-        }
-//CHECK SUM計算、書き込み
-        csum = 0 - csum;
-        file.write(csum);
-      }
-      file.write(char(0x3A));
-      file.write(char(0x00));
-      file.write(char(0x00));
-      file.close();
+      w_body();
+      w_file.close();
     }else{
       snd1byte(0xf0);
     }
@@ -464,13 +475,16 @@ unsigned int lp1;
   if (m_name[0]!=0x00){
     addcmt(m_name,f_name);
   
+  if( true == w_file ){
+    w_file.close();
+  }
 //ファイルが存在すればdelete
     if (SD.exists(f_name) == true){
       SD.remove(f_name);
     }
 //ファイルオープン
-    file = SD.open( f_name, FILE_WRITE );
-    if( true == file ){
+    w_file = SD.open( f_name, FILE_WRITE );
+    if( true == w_file ){
 //状態コード送信(OK)
       snd1byte(0x00);
 
@@ -486,21 +500,21 @@ unsigned int lp1;
       e_adrs = s_adrs1+s_adrs2*256;
 //ヘッダー 0xD3 x 9回書き込み
       for (lp1 = 0;lp1 <= 9;lp1++){
-        file.write(char(0xD3));
+        w_file.write(char(0xD3));
       }
 //DOSファイル名の先頭6文字をファイルネームとして書き込み
       for (lp1 = 0;lp1 <= 5;lp1++){
-        file.write(m_name[lp1]);
+        w_file.write(m_name[lp1]);
       }
 //実データ (e_adrs - s_adrs +1)を受信、書き込み
       for (lp1 = s_adrs;lp1 <= e_adrs;lp1++){
-        file.write(rcv1byte());
+        w_file.write(rcv1byte());
       }
 //終了 0x00 x 9回書き込み
       for (lp1 = 1;lp1 <= 9;lp1++){
-        file.write(char(0x00));
+        w_file.write(char(0x00));
       }
-      file.close();
+      w_file.close();
     } else {
       snd1byte(0xf0);
     }
@@ -543,6 +557,92 @@ void cmt_5f9e(void){
   if (f_length == r_count){
     file.close();
   }      
+}
+
+//read file open
+void sd_ropen(void){
+  receive_name(f_name);
+//ファイルが存在しなければERROR
+  if (SD.exists(f_name) == true){
+//ファイルオープン
+    file = SD.open( f_name, FILE_READ );
+    if( true == file ){
+//f_length設定、r_count初期化
+      f_length = file.size();
+      r_count = 0;
+//状態コード送信(OK)
+      snd1byte(0x00);
+    } else {
+      snd1byte(0xf0);
+    }
+  }else{
+    snd1byte(0xf1);
+  }
+}
+
+//write file append open
+void sd_waopen(void){
+  receive_name(w_name);
+//ファイルオープン
+  if( true == w_file ){
+    w_file.close();
+  }
+  w_file = SD.open( w_name, FILE_WRITE );
+  if( true == w_file ){
+//状態コード送信(OK)
+    snd1byte(0x00);
+  } else {
+    snd1byte(0xf0);
+  }
+}
+
+//write file new open
+void sd_wnopen(void){
+  receive_name(w_name);
+  if( true == w_file ){
+    w_file.close();
+  }
+//ファイルが存在すればdelete
+  if (SD.exists(w_name) == true){
+    SD.remove(w_name);
+  }
+//ファイルオープン
+  w_file = SD.open( w_name, FILE_WRITE );
+  if( true == w_file ){
+//状態コード送信(OK)
+    snd1byte(0x00);
+  } else {
+    snd1byte(0xf0);
+  }
+}
+
+//write 1byte 5F2FH代替
+void sd_w1byte(void){
+  int rdata = rcv1byte();
+  if( true == w_file ){
+    w_file.write(rdata);
+//状態コード送信(OK)
+    snd1byte(0x00);
+  } else {
+    snd1byte(0xf0);
+  }
+}
+
+//5ED9H代替
+void sd_wdirect(void){
+  if( true == w_file ){
+    w_body();
+    w_file.close();
+//状態コード送信(OK)
+    snd1byte(0x00);
+  }else{
+    snd1byte(0xf0);
+  }
+}
+
+//write file close
+void sd_wclose(void){
+    w_file.close();
 }
 
 // SD-CARDのFILELIST
@@ -707,6 +807,49 @@ void loop()
         snd1byte(0x00);
         bas_kill();
         break;
+//76h:PC-8001 SD FILE READ OPEN
+      case 0x76:
+////    Serial.println("SD FILE READ OPEN START");
+//状態コード送信(OK)
+        snd1byte(0x00);
+        sd_ropen();
+        break;
+//77h:PC-8001 SD FILE WRITE APPEND OPEN
+      case 0x77:
+////    Serial.println("SD FILE WRITE APPEND OPEN START");
+//状態コード送信(OK)
+        snd1byte(0x00);
+        sd_waopen();
+        break;
+//78h:PC-8001 SD FILE WRITE 1Byte
+      case 0x78:
+////    Serial.println("SD FILE WRITE 1Byte START");
+//状態コード送信(OK)
+        snd1byte(0x00);
+        sd_w1byte();
+        break;
+//79h:PC-8001 SD FILE WRITE NEW OPEN
+      case 0x79:
+////    Serial.println("SD FILE WRITE NEW OPEN START");
+//状態コード送信(OK)
+        snd1byte(0x00);
+        sd_wnopen();
+        break;
+//7Ah:PC-8001 SD WRITE 5ED9H
+      case 0x7A:
+////    Serial.println("SD WRITE 5ED9H START");
+//状態コード送信(OK)
+        snd1byte(0x00);
+        sd_wdirect();
+        break;
+//7Bh:PC-8001 SD FILE WRITE CLOSE
+      case 0x7B:
+////    Serial.println("SD FILE WRITE CLOSE START");
+//状態コード送信(OK)
+        snd1byte(0x00);
+        sd_wclose();
+        break;
+
 //83hでファイルリスト出力
       case 0x83:
 ////    Serial.println("FILE LIST START");
