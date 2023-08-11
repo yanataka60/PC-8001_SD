@@ -8,6 +8,8 @@
 
 　接続は、PC-8001本体後ろの拡張端子に接続しますが、50pフラットケーブルでの接続、50pカードエッジコネクタでの接続のどちらかを選択できます。
 
+#### (2023.8.11追加)Rev1.4基板では拡張端子と同じ配列の50Pinピンヘッダを追加しました。これにより50pカードエッジコネクタで接続した時にもRAMボード等を接続できるようになります。
+
 　なお、Arduino、ROMへ書き込むための機器が別途必要となります。
 
 #### 注)N-BASIC Ver1.1で動作確認を行っていますが、N-BASIC Ver1.0では動作しないとの報告を頂きました。
@@ -15,13 +17,22 @@
 #### 　　N-BASIC Ver1.0で動作させるには起動直後に「DEF USR=&H6003:A=USR(0)」を実行してください。
 
 ## 回路図
+### Rev1.2
 　KiCadフォルダ内のPC-8001_SD.pdfを参照してください。
 
 [回路図](https://github.com/yanataka60/PC-8001_SD/blob/main/Kicad/PC-8001_SD.pdf)
 
 ![PC-8001_SD](https://github.com/yanataka60/PC-8001_SD/blob/main/Kicad/PC-8001_SD.jpg)
 
+### Rev1.4
+　KiCad1_4フォルダ内のPC-8001_SD.pdfを参照してください。
+
+[回路図](https://github.com/yanataka60/PC-8001_SD/blob/main/Kicad1_4/PC-8001_SD.pdf)
+
+![PC-8001_SD](https://github.com/yanataka60/PC-8001_SD/blob/main/Kicad1_4/PC-8001_SD.jpg)
+
 ## 部品
+### Rev1.2
 |番号|品名|数量|備考|
 | ------------ | ------------ | ------------ | ------------ |
 ||J1、J3のいずれか|||
@@ -50,7 +61,13 @@
 
 　　　注4)J2又はJ4のどちらかを選択して取り付けてください。
 
-### MicroSD Card Adapterを使う(Rev1.2)
+### Rev1.4
+Rev1.2基板に以下の部品が追加となります。
+|番号|品名|数量|備考|
+| ------------ | ------------ | ------------ | ------------ |
+|J5|2x25Pinコネクタ|1|秋月電子通商 PH-2x40RGなど(注1)|
+
+### MicroSD Card Adapterを使う(Rev1.2以上)
 J4に取り付けます。
 
 MicroSD Card Adapterについているピンヘッダを除去してハンダ付けするのが一番確実ですが、J4の穴にMicroSD Card Adapterをぴったりと押しつけ、裏から多めにハンダを流し込むことでハンダ付けをする方法もあります。なお、この方法の時にはしっかりハンダ付けが出来たかテスターで導通を確認しておいた方が安心です。
@@ -117,6 +134,12 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 ![Card Edge Connector2](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/PC-8001_SD(4).JPG)
 
 #### 私の入手したカードエッジコネクタでは基板と本体の間が充分に離れていますが、カードエッジコネクタによっては接触の危険があるかもしれません。気になる方はカプトンテープなどで裏面を保護してください。
+
+#### Rev1.4基板でJ5ピンヘッダを使ってRAMボード等接続する場合
+　J5 50Pinピンヘッダは、拡張端子と同じ配列です。フラットケーブルを接続してRAMボード等を接続できますが、接続する向きを間違えないようにしてください。
+![Rev14_1](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/Rev14(1).JPG)
+![Rev14_2](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/Rev14(2).JPG)
+![Rev14_3](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/Rev14(3).JPG)
 
 ## SD-CARD
 　FAT16又はFAT32が認識できます。
@@ -712,3 +735,7 @@ https://bugfire2009.ojaru.jp/semigra/
 2023.6.10
 
 　SDアクセスサービスルーチンを追加、エントリポイントを公開。5F3AH代替ルーチンを見直し。
+
+2023.8.11
+
+　Rev1.4基板を追加しました。
