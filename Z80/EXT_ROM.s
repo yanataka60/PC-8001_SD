@@ -10,6 +10,8 @@
 ;2023.5.30 MONHOTの扱い方を修正、MONERRを移動
 ;          LOAD中専用のスタックポインタとすることでCLEAR文でSPを変更していなくてもE800H以降に正常にLOAD出来るよう対処
 ;2023.6.10 SDアクセスサービスルーチンを追加。5F3AH代替ルーチンを見直し。
+;          PC-8001_SDの存在チェックとして$6000から$41,$42,$00,$18,$1C,$00,$C3までを固定。
+;2023.9.10 N-BASIC 1.0を判別してMONで初期化
 
 CONOUT		EQU		0257H		;CRTへの1バイト出力
 DISPBL		EQU		0350H		;ベルコードの出力
@@ -17,6 +19,7 @@ CSR			EQU		03A9H		;カーソルの移動
 CSRADR		EQU		03F3H		;キャラクタ座標->VRAMアドレス変換
 DSPCSR		EQU		0BE2H		;カーソル表示の開始
 KYSCAN		EQU		0FACH		;リアルタイム・キーボード・スキャニング
+BASVER		EQU		1850H		;N-BASIC Version判定
 LINPUT		EQU		1B7EH		;スクリーン・エディタ
 AFTLOAD		EQU		1F8BH		;BASICテキストの終了アドレス設定
 CHROUT		EQU		40A6H		;デバイスへの1バイト出力
@@ -259,12 +262,23 @@ F2CHK:	IN		A,(PPI_C)
 MONINI:	LD		(MONHL),HL
 		LD		(MONSP),SP
 		
+;************* N-BASICV1.0判別 ***************************
+		LD		A,(BASVER)
+		CP		30H
+		JR		Z,VER0
 ;************ (TBLOAD)にCMDLOADがセットされていなければMONBGNへジャンプして通常MONITOR起動 ***************
 		LD		HL,(TBLOAD)
 		LD		DE,CMDLOAD
 		SBC		HL,DE
 		JP		NZ,MONBGN
+		JR		VER1
 
+VER0:
+;************ N-BASICV1.0用 SHIFTキーが押されていなければPC-8001_SDを使用可能に設定、押されていればMONBGNへジャンプして通常MONITOR起動 ***************
+		CALL	INIT
+		JP		Z,MONBGN
+
+VER1:
 ;		PUSH	HL                ;タイトルを表示するとBASICから戻ったときに自動実行が途切れてしまうため削除
 ;		LD		HL,MONMSG
 ;		CALL	MSGOUT
