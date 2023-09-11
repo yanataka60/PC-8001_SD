@@ -14,7 +14,7 @@
 
 #### 注)N-BASIC Ver1.1で動作確認を行っていますが、N-BASIC Ver1.0では動作しないとの報告を頂きました。
 #### 　　Ver1.0のバグにより拡張ROMの検出ができないため、PC-8001_SDの初期化がされないことが分かりました。
-#### 　　N-BASIC Ver1.0で動作させるには起動直後に「DEF USR=&H6003:A=USR(0)」を実行してください。
+#### 　　(2023.9.11)N-BASIC Ver1.0で動作させるには起動直後に「MON」を実行し、MONITORに入ることでPC-8001_SDの初期化を行うようにしました。Bコマンド又はCTRL+CでBASICに戻ることでBASICからもPC-8001_SDが使えるようになります。
 
 ## 回路図
 ### Rev1.2
@@ -493,7 +493,7 @@ https://bugfire2009.ojaru.jp/semigra/
 #### PSA基板に増設する拡張メモリー基板で動作しないとの報告を頂きました。
 #### PSA基板に増設する拡張メモリー基板の仕様を確認したところ、拡張ROM領域を単純にRAMに置き換えることを目的として設計されており、バンク切替動作をサポートしていないため共存できません。
 
-### Rev1.2での対応
+### Rev1.2以上での対応
 　S2のROMDS3を「EXT」にすることでポートE2hを制御して$0000～$7FFFの空間をROM→RAM切替するボードと共存できます。
 
 ![RIMDS3_SWITCH](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/RIMDS3_SWITCH.JPG)
@@ -741,3 +741,7 @@ https://bugfire2009.ojaru.jp/semigra/
 2023.8.11
 
 　Rev1.4基板を追加しました。
+
+2023.9.11
+
+　N-BASIC V1.0の場合、MONITORに入ることでPC-8001_SDの初期化が行われるように修正。
