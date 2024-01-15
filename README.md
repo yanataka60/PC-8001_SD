@@ -144,7 +144,13 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 ![Rev14_3](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/Rev14(3).JPG)
 
 ## SD-CARD
-　FAT16又はFAT32が認識できます。
+　出来れば8GB以下のSDカードを用意してください。
+
+　ArduinoのSdFatライブラリは、SD規格(最大2GB)、SDHC規格(2GB～32GB)に対応していますが、SDXC規格(32GB～2TB)には対応していません。
+
+　また、SDHC規格のSDカードであっても32GB、16GBは相性により動作しないものがあるようです。
+
+　FAT16又はFAT32が認識できます。NTFSは認識できません。
 
 　ルートに置かれた拡張子が「.CMT」のCMT形式ファイルのみ認識できます。(CMT形式以外のファイル、フォルダも表示されますがLOAD実行の対象になりません)
 
@@ -751,3 +757,7 @@ https://bugfire2009.ojaru.jp/semigra/
 　ファイル名長さの仕様を訂正
 
 　　誤)「.CMT」を除いて32文字      正)「.CMT」を含めて31文字
+
+2024.1.15
+
+　SDカードは8GB以下が望ましいことを追記。
