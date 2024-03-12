@@ -379,7 +379,7 @@ Sの後ろ、アドレス、データの区切りに空白が有っても無く�
 
 　(2024.3.12) SD-CARDにアクセスしていない時に電源が入ったままでSD-CARDを抜くと再度SD-CARDを挿入してもSD-CARDにアクセスできない問題を解消しました。(Arduinoを最新版に書き換えてください)
 
-　再度SD-CARDを挿入した後、FDL、LOAD、SAVE等でSD-CARDに3回ほどアクセスすれば復旧します。
+　再度SD-CARDを挿入した後、FILES、LOAD、SAVE等でSD-CARDに3回ほどアクセスすれば復旧します。
 
 
 ## New City HeroをSDから読み込み実行するための修正
