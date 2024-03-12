@@ -371,11 +371,16 @@ Sの後ろ、アドレス、データの区切りに空白が有っても無く�
 　2　SD-CARDからのBASICプログラムをLOADするコマンドは「LOAD」で、1本のCMTファイルとなっていればファイル名を指定する必要もありませんので「CLOAD"ファイル名"」は「LOAD""」に修正されます。
 
 ## 操作上の注意
-　「SD-CARD INITIALIZE ERROR」と表示されたときは、SD-CARDが挿入されているか確認し、PC-8001本体をリセットしてください。Arduinoのみのリセットでは復旧しません。
+　~~「SD-CARD INITIALIZE ERROR」と表示されたときは、SD-CARDをいったん抜き再挿入したうえでArduinoをリセットしてください。~~
 
-　SD-CARDにアクセスしていない時に電源が入ったままで SD-CARDを抜いた後、再挿入しSD-CARDにアクセスすると「SD-CARD INITIALIZE ERROR」となる場合があります。再挿入した場合にはSD-CARDにアクセスする前にArduinoを必ずリセットしてください。
+　~~SD-CARDにアクセスしていない時に電源が入ったままで SD-CARDを抜いた後、再挿入しSD-CARDにアクセスすると「SD-CARD INITIALIZE ERROR」となる場合があります。再挿入した場合にはSD-CARDにアクセスする前にArduinoを必ずリセットしてください。~~
 
-　SD-CARDの抜き差しは電源を切った状態で行うほうがより確実です。
+　~~SD-CARDの抜き差しは電源を切った状態で行うほうがより確実です。~~
+
+　(2024.3.12) SD-CARDにアクセスしていない時に電源が入ったままでSD-CARDを抜くと再度SD-CARDを挿入してもSD-CARDにアクセスできない問題を解消しました。(Arduinoを最新版に書き換えてください)
+
+　再度SD-CARDを挿入した後、FDL、LOAD、SAVE等でSD-CARDに3回ほどアクセスすれば復旧します。
+
 
 ## New City HeroをSDから読み込み実行するための修正
 　PC-8001_SDは内藤 時浩さんが頒布されているNew City HeroをPC-8001実機で手軽に遊びたいが為に作ったといっても過言ではありません。
@@ -761,3 +766,7 @@ https://bugfire2009.ojaru.jp/semigra/
 2024.1.15
 
 　SDカードは8GB以下が望ましいことを追記。
+
+2024.3.12
+
+　電源が入ったままでSD-CARDを抜くと再度SD-CARDを挿入してもSD-CARDにアクセスできない問題を解消した。

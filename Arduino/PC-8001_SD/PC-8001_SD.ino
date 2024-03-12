@@ -1,3 +1,4 @@
+// 2024. 3.12 sd-card再挿入時の初期化処理を追加
 //
 #include "SdFat.h"
 #include <SPI.h>
@@ -30,6 +31,19 @@ unsigned int s_adrs,e_adrs,w_length,w_len1,w_len2,s_adrs1,s_adrs2,b_length;
 #define PA3PIN          (19)
 // ファイル名は、ロングファイルネーム形式対応
 boolean eflg;
+
+void sdinit(void){
+  // SD初期化
+  if( !SD.begin(CABLESELECTPIN,8) )
+  {
+////    Serial.println("Failed : SD.begin");
+    eflg = true;
+  } else {
+////    Serial.println("OK : SD.begin");
+    eflg = false;
+  }
+////    Serial.println("START");
+}
 
 void setup(){
 ////    Serial.begin(9600);
@@ -67,16 +81,7 @@ void setup(){
 //sd_waopen sd_wnopen sd_wdirectでSAVE用ファイル名を指定なくSAVEされた場合のデフォルトファイル名を設定
   strcpy(w_name,"default.dat");
 
-  // SD初期化
-  if( !SD.begin(CABLESELECTPIN,8) )
-  {
-////    Serial.println("Failed : SD.begin");
-    eflg = true;
-  } else {
-////    Serial.println("OK : SD.begin");
-    eflg = false;
-  }
-////    Serial.println("START");
+  sdinit();
 }
 
 //4BIT受信
@@ -193,10 +198,12 @@ void cmt_load(void){
         flg = true;
       } else {
         snd1byte(0xf0);
+        sdinit();
         flg = false;
       }
     }else{
       snd1byte(0xf1);
+      sdinit();
       flg = false;
     }
   }else{
@@ -307,10 +314,12 @@ void bas_load(void){
         flg = true;
       } else {
         snd1byte(0xf0);
+        sdinit();
         flg = false;
       }
     }else{
       snd1byte(0xf1);
+      sdinit();
       flg = false;
     }
   } else{
@@ -459,9 +468,11 @@ byte r_data,csum;
       w_file.close();
     }else{
       snd1byte(0xf0);
+      sdinit();
     }
   }else{
     snd1byte(0xf6);
+    sdinit();
   }
 }
 
@@ -517,9 +528,11 @@ unsigned int lp1;
       w_file.close();
     } else {
       snd1byte(0xf0);
+      sdinit();
     }
   }else{
     snd1byte(0xf1);
+    sdinit();
   }
 }
 
@@ -542,9 +555,11 @@ unsigned int lp1;
       snd1byte(0x00);
     }else{
       snd1byte(0xf1);
+      sdinit();
     }
   }else{
     snd1byte(0xf1);
+    sdinit();
   }
 }
 
@@ -574,9 +589,11 @@ void sd_ropen(void){
       snd1byte(0x00);
     } else {
       snd1byte(0xf0);
+      sdinit();
     }
   }else{
     snd1byte(0xf1);
+    sdinit();
   }
 }
 
@@ -593,6 +610,7 @@ void sd_waopen(void){
     snd1byte(0x00);
   } else {
     snd1byte(0xf0);
+    sdinit();
   }
 }
 
@@ -613,6 +631,7 @@ void sd_wnopen(void){
     snd1byte(0x00);
   } else {
     snd1byte(0xf0);
+    sdinit();
   }
 }
 
@@ -625,6 +644,7 @@ void sd_w1byte(void){
     snd1byte(0x00);
   } else {
     snd1byte(0xf0);
+    sdinit();
   }
 }
 
@@ -637,6 +657,7 @@ void sd_wdirect(void){
     snd1byte(0x00);
   }else{
     snd1byte(0xf0);
+    sdinit();
   }
 }
 
@@ -855,6 +876,7 @@ void loop()
 ////    Serial.println("FILE LIST START");
 //状態コード送信(OK)
         snd1byte(0x00);
+        sdinit();
         dirlist();
         break;
       default:
@@ -864,5 +886,6 @@ void loop()
   } else {
 //状態コード送信(ERROR)
     snd1byte(0xF0);
+    sdinit();
   }
 }
