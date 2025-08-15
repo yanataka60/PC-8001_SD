@@ -129,6 +129,9 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 
 ## 接続
 　PC-8001本体後ろの拡張端子に接続します。
+
+#### 注)PC-8001本体後ろの拡張端子は経年劣化により接触不良となることが非常に多いです。動作不良の場合は一度、拡張端子を消しゴムで擦る、アルコールで拭く等掃除をしてみてください。
+
 ### フラットケーブルによる接続
 ![Flat cable1](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/PC-8001_SD(3).JPG)
 ![Flat cable2](https://github.com/yanataka60/PC-8001_SD/blob/main/JPEG/PC-8001_SD(5).JPG)
@@ -786,3 +789,5 @@ https://bugfire2009.ojaru.jp/semigra/
 2025.1.29
 
 　コネクタの記述を修正しました。
+
+2025.8.15 PC-8001本体後部拡張端子の接触不良について追記。
