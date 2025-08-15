@@ -12,6 +12,7 @@
 ;2023.6.10 SDアクセスサービスルーチンを追加。5F3AH代替ルーチンを見直し。
 ;          PC-8001_SDの存在チェックとして$6000から$41,$42,$00,$18,$1C,$00,$C3までを固定。
 ;2023.9.10 N-BASIC 1.0を判別してMONで初期化
+;2025.8.15  PC-8001mk2_SDとのソースコード互換性確保のためN-BASICV1.0判別ルーチンを後ろに移動
 
 CONOUT		EQU		0257H		;CRTへの1バイト出力
 DISPBL		EQU		0350H		;ベルコードの出力
@@ -262,16 +263,20 @@ F2CHK:	IN		A,(PPI_C)
 MONINI:	LD		(MONHL),HL
 		LD		(MONSP),SP
 		
+;************* N-BASICV1.0判別を追加したためのアドレスずれを解消するために移動 2024.9.6 ***************************
+		JP		N10
+		DS		2
+
 ;************* N-BASICV1.0判別 ***************************
-		LD		A,(BASVER)
-		CP		30H
-		JR		Z,VER0
+;		LD		A,(BASVER)
+;		CP		30H
+;		JR		Z,VER0
 ;************ (TBLOAD)にCMDLOADがセットされていなければMONBGNへジャンプして通常MONITOR起動 ***************
-		LD		HL,(TBLOAD)
-		LD		DE,CMDLOAD
-		SBC		HL,DE
-		JP		NZ,MONBGN
-		JR		VER1
+;		LD		HL,(TBLOAD)
+;		LD		DE,CMDLOAD
+;		SBC		HL,DE
+;		JP		NZ,MONBGN
+;		JR		VER1
 
 VER0:
 ;************ N-BASICV1.0用 SHIFTキーが押されていなければPC-8001_SDを使用可能に設定、押されていればMONBGNへジャンプして通常MONITOR起動 ***************
@@ -1363,6 +1368,18 @@ DEND:
 DEFDIR2:
 		DB		'LOAD ',22H
 D2END:
+
+
+;************* N-BASICV1.0判別 ***************************
+N10		LD		A,(BASVER)
+		CP		30H
+		JP		Z,VER0
+;************ (TBLOAD)にCMDLOADがセットされていなければMONBGNへジャンプして通常MONITOR起動 ***************
+		LD		HL,(TBLOAD)
+		LD		DE,CMDLOAD
+		SBC		HL,DE
+		JP		NZ,MONBGN
+		JP		VER1
 
 
 		ORG		7FFCH
